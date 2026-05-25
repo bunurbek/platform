@@ -220,12 +220,13 @@
     <h2 class="section__title fade-in">Kursdan keyin ular yaratayotgan ishlar</h2>
     <div class="student-work__grid">
 
+      {% with R2='https://pub-e15987dc05304bdeaacbe6ab18ee4263.r2.dev/student-work' %}
       <div class="student-work__card fade-in delay-1">
         <div class="student-work__video-wrap">
           <video class="student-work__video" muted loop playsinline preload="metadata"
-                 poster="{% static 'images/durdona-work-poster.jpg' %}"
+                 poster="{{ R2 }}/durdona-work-poster.jpg"
                  onmouseenter="this.play()" onmouseleave="this.pause(); this.currentTime=0;">
-            <source src="{% static 'images/durdona-work.mp4' %}" type="video/mp4">
+            <source src="{{ R2 }}/durdona-work.mp4" type="video/mp4">
           </video>
           <button class="student-work__play" aria-label="Play">▶</button>
         </div>
@@ -238,9 +239,9 @@
       <div class="student-work__card fade-in delay-2">
         <div class="student-work__video-wrap">
           <video class="student-work__video" muted loop playsinline preload="metadata"
-                 poster="{% static 'images/ismigul-work-poster.jpg' %}"
+                 poster="{{ R2 }}/ismigul-work-poster.jpg"
                  onmouseenter="this.play()" onmouseleave="this.pause(); this.currentTime=0;">
-            <source src="{% static 'images/ismigul-work.mp4' %}" type="video/mp4">
+            <source src="{{ R2 }}/ismigul-work.mp4" type="video/mp4">
           </video>
           <button class="student-work__play" aria-label="Play">▶</button>
         </div>
@@ -253,9 +254,9 @@
       <div class="student-work__card fade-in delay-3">
         <div class="student-work__video-wrap">
           <video class="student-work__video" muted loop playsinline preload="metadata"
-                 poster="{% static 'images/abdulloh-work-poster.jpg' %}"
+                 poster="{{ R2 }}/abdulloh-work-poster.jpg"
                  onmouseenter="this.play()" onmouseleave="this.pause(); this.currentTime=0;">
-            <source src="{% static 'images/abdulloh-work.mp4' %}" type="video/mp4">
+            <source src="{{ R2 }}/abdulloh-work.mp4" type="video/mp4">
           </video>
           <button class="student-work__play" aria-label="Play">▶</button>
         </div>
@@ -264,6 +265,7 @@
           <p>Marketing komandasi bilan ishlamoqda</p>
         </div>
       </div>
+      {% endwith %}
 
     </div>
   </div>
