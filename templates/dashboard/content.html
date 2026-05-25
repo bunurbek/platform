@@ -1,0 +1,346 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Kontent{% endblock %}
+{% block page_title %}Kurs kontentini boshqarish{% endblock %}
+{% block nav_content %}dash-nav__item--active{% endblock %}
+
+{% block content %}
+
+<div x-data="contentMgr()">
+
+  <div class="dash-section-head">
+    <h2>{{ course.title|default:'Kurs' }}</h2>
+    <button class="btn btn--primary btn--sm" @click="modModal=true">+ Yangi modul</button>
+  </div>
+
+  <!-- Modules list -->
+  <div id="module-list" style="display:flex;flex-direction:column;gap:10px">
+
+    {% for m in modules %}
+    <div class="lesson-row" id="module-{{ m.pk }}" data-id="{{ m.pk }}"
+         style="display:block;padding:0;background:#1a1a1a;border:1px solid #252525;border-radius:10px;overflow:hidden">
+
+      <!-- Module head -->
+      <div style="display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer"
+           @click="open = open === {{ m.pk }} ? null : {{ m.pk }}">
+        <span style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;color:#E8B84B;opacity:0.6;width:34px;flex-shrink:0">
+          M{{ m.order|stringformat:"02d" }}
+        </span>
+        <div style="flex:1">
+          <p style="font-size:15px;font-weight:600;color:#F0F0F0">{{ m.title }}</p>
+          <p style="font-size:12px;color:#606060;margin-top:2px">
+            {{ m.lessons.count }} video
+            {% if m.total_duration %} · {{ m.total_duration }} daq{% endif %}
+          </p>
+        </div>
+        <button class="badge {% if m.is_free %}badge--green{% else %}badge--gray{% endif %}"
+                @click.stop="toggleFree({{ m.pk }}, $el)">
+          {% if m.is_free %}Bepul{% else %}Pullik{% endif %}
+        </button>
+        <button class="dash-btn dash-btn--red" @click.stop="deleteModule({{ m.pk }})">🗑</button>
+        <span style="color:#606060;transition:transform 0.2s" :style="open === {{ m.pk }} ? 'transform:rotate(180deg)' : ''">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </div>
+
+      <!-- Sub-lessons dropdown -->
+      <div x-show="open === {{ m.pk }}" x-cloak x-transition
+           style="background:#0a0a0a;border-top:1px solid #252525;padding:14px 20px">
+        {% for l in m.lessons.all %}
+        <div id="lesson-{{ l.pk }}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#1a1a1a;border:1px solid #252525;border-radius:8px;margin-bottom:6px">
+          <span style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:#A0A0A0;width:30px;flex-shrink:0">
+            {{ m.order }}.{{ l.order }}
+          </span>
+          <div style="flex:1;min-width:0">
+            <p style="font-size:14px;color:#F0F0F0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ l.title }}</p>
+            <p style="font-size:12px;color:#606060;margin-top:2px">
+              {% if l.duration_minutes %}⏱ {{ l.duration_minutes }} daq{% endif %}
+              {% if l.video_url %} · 🔗 URL{% endif %}
+              {% if l.video_file %} · 📁 Video{% endif %}
+              {% if not l.video_url and not l.video_file %} · ⚠ Video yo'q{% endif %}
+              {% if l.homework_pdf %} · 📄 Vazifa{% endif %}
+            </p>
+          </div>
+          <button class="dash-btn dash-btn--gray"
+                  @click="openEditLesson({{ l.pk }}, {{ l|safe|escapejs|default:'null' }})"
+                  data-lesson-id="{{ l.pk }}"
+                  data-title="{{ l.title|escapejs }}"
+                  data-description="{{ l.description|escapejs }}"
+                  data-video-url="{{ l.video_url|escapejs }}"
+                  data-duration="{{ l.duration_minutes }}"
+                  data-homework-note="{{ l.homework_note|escapejs }}"
+                  data-homework-url="{% if l.homework_pdf %}{{ l.homework_pdf.url }}{% endif %}"
+                  data-homework-name="{% if l.homework_pdf %}{{ l.homework_pdf.name|cut:'homework/' }}{% endif %}"
+                  >✎ Tahrirlash</button>
+          <button class="dash-btn dash-btn--red" @click="deleteLesson({{ l.pk }})">🗑</button>
+        </div>
+        {% empty %}
+        <p style="text-align:center;color:#606060;padding:12px;font-size:13px">
+          Bu modulda hali video yo'q
+        </p>
+        {% endfor %}
+
+        <button class="btn btn--secondary btn--sm" @click="openLessonModal({{ m.pk }}, '{{ m.title|escapejs }}')"
+                style="margin-top:8px;width:100%;justify-content:center">
+          + Video qo'shish
+        </button>
+      </div>
+
+    </div>
+    {% empty %}
+    <div class="empty-state">
+      <div class="empty-state__icon">🎬</div>
+      <p class="empty-state__text">Hali modullar yo'q. Birinchi modulni qo'shing!</p>
+    </div>
+    {% endfor %}
+
+  </div>
+
+  <!-- Add module modal -->
+  <div class="modal-overlay" x-show="modModal" x-cloak @click.self="modModal=false">
+    <div class="modal" @click.stop>
+      <p class="modal__title">Yangi modul</p>
+      <p class="modal__sub">Modul — bir mavzu bo'yicha videolar to'plami</p>
+
+      <div class="modal__field">
+        <label class="modal__label">Modul nomi *</label>
+        <input class="modal__input" type="text" x-model="newMod.title" placeholder="Masalan: Yorug'lik bilan ishlash">
+      </div>
+      <div class="modal__field">
+        <label class="modal__label">Tavsif</label>
+        <input class="modal__input" type="text" x-model="newMod.description" placeholder="Qisqacha tavsif">
+      </div>
+      <div class="modal__field">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:#A0A0A0;font-size:14px">
+          <input type="checkbox" x-model="newMod.is_free" style="width:16px;height:16px;accent-color:#E8B84B">
+          Bepul namuna modul
+        </label>
+      </div>
+
+      <div class="modal__actions">
+        <button class="btn btn--primary" style="flex:1" @click="saveModule()">Saqlash</button>
+        <button class="btn btn--ghost" @click="modModal=false">Bekor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit lesson modal — includes homework PDF upload -->
+  <div class="modal-overlay" x-show="editModal" x-cloak @click.self="editModal=false">
+    <div class="modal" @click.stop style="max-width:560px">
+      <p class="modal__title">Darsni tahrirlash</p>
+      <p class="modal__sub">Tavsif, video, davomiyligi va vazifa fayli</p>
+
+      <div class="modal__field">
+        <label class="modal__label">Dars nomi *</label>
+        <input class="modal__input" type="text" x-model="editLesson.title">
+      </div>
+      <div class="modal__field">
+        <label class="modal__label">Tavsif (talaba nimani o'rganadi)</label>
+        <textarea class="modal__input" rows="3" x-model="editLesson.description"
+                  style="resize:vertical;font-family:inherit"
+                  placeholder="Bu darsda nimani o'rganasiz, qaysi texnikalar yoritiladi..."></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px">
+        <div class="modal__field">
+          <label class="modal__label">Video URL</label>
+          <input class="modal__input" type="url" x-model="editLesson.video_url"
+                 placeholder="https://www.youtube.com/embed/...">
+        </div>
+        <div class="modal__field">
+          <label class="modal__label">Daqiqa</label>
+          <input class="modal__input" type="number" x-model="editLesson.duration_minutes">
+        </div>
+      </div>
+
+      <div style="border-top:1px solid #252525;margin:18px 0 14px;padding-top:18px">
+        <p style="font-size:13px;color:#E8B84B;font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">📄 Uy vazifasi</p>
+
+        <div class="modal__field">
+          <label class="modal__label">Vazifa izohi (ixtiyoriy)</label>
+          <textarea class="modal__input" rows="2" x-model="editLesson.homework_note"
+                    style="resize:vertical;font-family:inherit"
+                    placeholder="Vazifani qisqacha tushuntirib bering..."></textarea>
+        </div>
+
+        <div class="modal__field">
+          <label class="modal__label">PDF fayl</label>
+          <template x-if="editLesson.homework_url && !pdfFileSelected">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#0d0d10;border:1px solid #252525;border-radius:8px">
+              <span style="font-size:20px">📄</span>
+              <div style="flex:1;min-width:0">
+                <p style="font-size:13px;color:#F0F0F0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                   x-text="editLesson.homework_name || 'homework.pdf'"></p>
+                <a :href="editLesson.homework_url" target="_blank" style="font-size:11px;color:#5dade2;text-decoration:underline">Ko'rish</a>
+              </div>
+              <button class="dash-btn dash-btn--red" @click="removePdfFlag = true; editLesson.homework_url = ''; editLesson.homework_name = ''">O'chirish</button>
+            </div>
+          </template>
+          <input type="file" accept="application/pdf,.pdf" @change="onPdfChange($event)"
+                 style="display:block;width:100%;font-size:14px;color:#A0A0A0;padding:8px 0">
+          <p x-show="pdfFileSelected" style="font-size:12px;color:#2ECC71;margin-top:6px"
+             x-text="'✓ Tanlangan: ' + (pdfFileSelected?.name || '')"></p>
+        </div>
+      </div>
+
+      <div class="modal__actions">
+        <button class="btn btn--primary" style="flex:1" @click="saveEdit()" :disabled="saving"
+                :style="saving ? 'opacity:0.5' : ''">
+          <span x-show="!saving">✓ Saqlash</span>
+          <span x-show="saving">Saqlanmoqda...</span>
+        </button>
+        <button class="btn btn--ghost" @click="editModal=false">Bekor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add lesson modal -->
+  <div class="modal-overlay" x-show="lessonModal" x-cloak @click.self="lessonModal=false">
+    <div class="modal" @click.stop>
+      <p class="modal__title">Yangi video</p>
+      <p class="modal__sub" x-text="'Modul: ' + currentModuleTitle"></p>
+
+      <div class="modal__field">
+        <label class="modal__label">Video nomi *</label>
+        <input class="modal__input" type="text" x-model="newLesson.title" placeholder="Masalan: Diafragma asoslari">
+      </div>
+      <div class="modal__field">
+        <label class="modal__label">Tavsif</label>
+        <input class="modal__input" type="text" x-model="newLesson.description" placeholder="Qisqacha tavsif">
+      </div>
+      <div class="modal__field">
+        <label class="modal__label">Video URL (YouTube embed yoki direct mp4)</label>
+        <input class="modal__input" type="url" x-model="newLesson.video_url" placeholder="https://www.youtube.com/embed/...">
+      </div>
+      <div class="modal__field">
+        <label class="modal__label">Davomiyligi (daqiqa)</label>
+        <input class="modal__input" type="number" x-model="newLesson.duration_minutes" placeholder="10">
+      </div>
+
+      <div class="modal__actions">
+        <button class="btn btn--primary" style="flex:1" @click="saveLesson()">Saqlash</button>
+        <button class="btn btn--ghost" @click="lessonModal=false">Bekor</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function contentMgr() {
+  return {
+    open: null,
+    modModal: false,
+    lessonModal: false,
+    editModal: false,
+    saving: false,
+    pdfFileSelected: null,
+    removePdfFlag: false,
+    currentModuleId: null,
+    currentModuleTitle: '',
+    newMod: { title:'', description:'', is_free: false },
+    newLesson: { title:'', description:'', video_url:'', duration_minutes: 0 },
+    editLesson: { id:0, title:'', description:'', video_url:'', duration_minutes:0, homework_note:'', homework_url:'', homework_name:'' },
+
+    openEditLesson(id, _legacy) {
+      const btn = document.querySelector(`[data-lesson-id="${id}"]`);
+      if (!btn) return;
+      this.editLesson = {
+        id,
+        title: btn.dataset.title || '',
+        description: btn.dataset.description || '',
+        video_url: btn.dataset.videoUrl || '',
+        duration_minutes: parseInt(btn.dataset.duration || 0),
+        homework_note: btn.dataset.homeworkNote || '',
+        homework_url: btn.dataset.homeworkUrl || '',
+        homework_name: btn.dataset.homeworkName || '',
+      };
+      this.pdfFileSelected = null;
+      this.removePdfFlag = false;
+      this.editModal = true;
+    },
+
+    onPdfChange(e) {
+      this.pdfFileSelected = e.target.files[0] || null;
+      this.removePdfFlag = false;
+    },
+
+    saveEdit() {
+      if (!this.editLesson.title.trim()) { alert("Dars nomini kiriting"); return; }
+      this.saving = true;
+      const fd = new FormData();
+      fd.append('title', this.editLesson.title);
+      fd.append('description', this.editLesson.description);
+      fd.append('video_url', this.editLesson.video_url);
+      fd.append('duration_minutes', this.editLesson.duration_minutes);
+      fd.append('homework_note', this.editLesson.homework_note);
+      if (this.pdfFileSelected) fd.append('homework_pdf', this.pdfFileSelected);
+      if (this.removePdfFlag)   fd.append('remove_homework', '1');
+      fetch(`/dashboard/content/lesson/${this.editLesson.id}/update/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        body: fd,
+      }).then(r => r.json()).then(d => {
+        this.saving = false;
+        if (d.ok) { this.editModal = false; location.reload(); }
+        else alert('Saqlashda xatolik');
+      }).catch(() => { this.saving = false; alert('Xatolik'); });
+    },
+
+    saveModule() {
+      if (!this.newMod.title.trim()) { alert('Modul nomini kiriting'); return; }
+      fetch('{% url "dash_module_add" %}', {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
+        body: JSON.stringify(this.newMod),
+      }).then(r=>r.json()).then(d=>{ if (d.ok) location.reload(); });
+    },
+
+    toggleFree(id, btn) {
+      fetch(`/dashboard/content/module/${id}/toggle-free/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'}
+      }).then(r=>r.json()).then(d=>{
+        if (d.ok) {
+          btn.textContent = d.is_free ? 'Bepul' : 'Pullik';
+          btn.className = 'badge ' + (d.is_free ? 'badge--green' : 'badge--gray');
+        }
+      });
+    },
+
+    deleteModule(id) {
+      if (!confirm('Modulni va uning ichidagi barcha videolarni o\'chirmoqchimisiz?')) return;
+      fetch(`/dashboard/content/module/${id}/delete/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'}
+      }).then(r=>r.json()).then(d=>{ if (d.ok) document.getElementById('module-' + id).remove(); });
+    },
+
+    openLessonModal(moduleId, moduleTitle) {
+      this.currentModuleId = moduleId;
+      this.currentModuleTitle = moduleTitle;
+      this.newLesson = { title:'', description:'', video_url:'', duration_minutes: 0 };
+      this.lessonModal = true;
+    },
+
+    saveLesson() {
+      if (!this.newLesson.title.trim()) { alert('Video nomini kiriting'); return; }
+      fetch(`/dashboard/content/module/${this.currentModuleId}/lesson/add/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
+        body: JSON.stringify(this.newLesson),
+      }).then(r=>r.json()).then(d=>{ if (d.ok) location.reload(); });
+    },
+
+    deleteLesson(id) {
+      if (!confirm('Bu videoni o\'chirmoqchimisiz?')) return;
+      fetch(`/dashboard/content/lesson/${id}/delete/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'}
+      }).then(r=>r.json()).then(d=>{ if (d.ok) document.getElementById('lesson-' + id).remove(); });
+    },
+  }
+}
+</script>
+{% endblock %}

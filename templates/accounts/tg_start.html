@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Bepul boshlash — Bu Nurbek{% endblock %}
+{% block content %}
+<div class="form-page">
+  <div class="form-card" style="text-align:center">
+
+    <div style="font-size:48px;margin-bottom:16px">📱</div>
+    <h1 class="form-card__title">Bepul boshlang</h1>
+    <p class="form-card__sub" style="margin-bottom:32px">
+      Birinchi darsni bepul ko'rish uchun Telegram orqali kiring
+    </p>
+
+    <ol style="text-align:left;list-style:none;padding:0;margin:0 0 28px 0;display:flex;flex-direction:column;gap:14px">
+      <li style="display:flex;gap:14px;align-items:flex-start">
+        <span style="background:#E8B84B;color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0">1</span>
+        <p style="font-size:15px;color:#A0A0A0">Telegram botda <strong style="color:#F0F0F0">START</strong> tugmasini bosing</p>
+      </li>
+      <li style="display:flex;gap:14px;align-items:flex-start">
+        <span style="background:#E8B84B;color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0">2</span>
+        <p style="font-size:15px;color:#A0A0A0"><strong style="color:#F0F0F0">Telefon raqamingizni</strong> ulashing — bot so'raydi</p>
+      </li>
+      <li style="display:flex;gap:14px;align-items:flex-start">
+        <span style="background:#E8B84B;color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0">3</span>
+        <p style="font-size:15px;color:#A0A0A0"><strong style="color:#F0F0F0">Ism va familiyangizni</strong> yozing</p>
+      </li>
+      <li style="display:flex;gap:14px;align-items:flex-start">
+        <span style="background:#2ECC71;color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0">✓</span>
+        <p style="font-size:15px;color:#A0A0A0">Bot sizga tugma yuboradi — bosing, dars boshlanadi 🎬</p>
+      </li>
+    </ol>
+
+    <a href="{{ tg_link }}" target="_blank" rel="noopener"
+       onclick="setTimeout(() => location.href='{% url 'tg_waiting' %}', 600)"
+       class="btn btn--primary btn--lg btn--full">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.48 14.62l-2.95-.924c-.64-.203-.654-.64.135-.95l11.57-4.461c.537-.194 1.006.131.327.963z"/></svg>
+      Telegramga o'tish
+    </a>
+
+    <p style="font-size:13px;color:#606060;margin-top:16px">
+      Telegram avtomatik ochiladi
+    </p>
+
+  </div>
+</div>
+{% endblock %}

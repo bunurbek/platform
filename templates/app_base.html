@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Bu Nurbek{% endblock %}</title>
+  {% load static %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="app-body">
+
+<!-- App-style nav (slim, no marketing links) -->
+<nav class="app-nav" x-data="{ menu: false }">
+  <div class="app-nav__inner">
+    <a href="{% url 'course_home' %}" class="app-nav__brand">
+      Bu <span>Nurbek</span>
+    </a>
+
+    <!-- Right: profile menu -->
+    <div class="app-nav__right">
+      <a href="{% url 'course_home' %}" class="app-nav__link {% block nav_course %}{% endblock %}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Kursim
+      </a>
+      <div class="app-profile" @click.outside="menu = false">
+        <button class="app-profile__btn" @click="menu = !menu" aria-label="Profil">
+          {% if user.telegram_photo %}
+          <img src="{{ user.telegram_photo }}" alt="">
+          {% else %}
+          <span class="app-profile__initial">{{ user.display_name|first|upper }}</span>
+          {% endif %}
+        </button>
+        <div class="app-profile__menu" x-show="menu" x-cloak x-transition @click="menu = false">
+          <div class="app-profile__head">
+            <p class="app-profile__name">{{ user.display_name }}</p>
+            {% if user.telegram_username %}
+            <p class="app-profile__sub">@{{ user.telegram_username }}</p>
+            {% elif user.phone %}
+            <p class="app-profile__sub">{{ user.phone }}</p>
+            {% endif %}
+          </div>
+          <div class="app-profile__divider"></div>
+          <a href="{% url 'course_home' %}" class="app-profile__item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            Kursim
+          </a>
+          <a href="{% url 'profile' %}" class="app-profile__item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profil
+          </a>
+          {% if user.is_staff %}
+          <a href="{% url 'dashboard_home' %}" class="app-profile__item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Admin
+          </a>
+          {% endif %}
+          <div class="app-profile__divider"></div>
+          <a href="{% url 'logout' %}" class="app-profile__item app-profile__item--danger">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Chiqish
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+{% if messages %}
+<div class="messages">
+  {% for message in messages %}
+  <div class="message message--{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% block content %}{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

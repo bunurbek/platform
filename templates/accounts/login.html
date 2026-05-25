@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Kirish — Bu Nurbek{% endblock %}
+{% block content %}
+<div class="form-page">
+  <div class="form-card">
+    <h1 class="form-card__title">Admin kirish</h1>
+    <p class="form-card__sub">Email va parol orqali kirish (admin paneli uchun)</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="id_email">Email</label>
+        <input class="form-input" type="email" name="email" id="id_email"
+               placeholder="admin@bunurbek.uz" autocomplete="email" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="id_password">Parol</label>
+        <input class="form-input" type="password" name="password" id="id_password"
+               placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn--primary btn--full" style="margin-top:8px">Kirish</button>
+    </form>
+    <p class="form-footer">Talabamisiz? <a href="{% url 'tg_start_view' %}">Telegram orqali kirish</a></p>
+  </div>
+</div>
+{% endblock %}

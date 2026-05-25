@@ -1,0 +1,88 @@
+{% extends 'app_base.html' %}
+{% load static %}
+{% block title %}Yopiq dars — Bu Nurbek{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/course.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="lock-page">
+  <div class="lock-card">
+
+    {% if lock_reason == 'cooldown' %}
+      <div class="lock-card__icon">⏰</div>
+      <h1 class="lock-card__title">Modul tez orada ochiladi</h1>
+      <p class="lock-card__text">
+        <strong style="color:var(--text)">{{ module.title }}</strong> moduli
+        <strong style="color:var(--gold)">{{ prev_module.title }}</strong> dan keyin
+        24 soat ichida ochiladi. Bilim singdirish uchun bu vaqt zarur.
+      </p>
+
+      <div class="cooldown-block" data-cooldown="{{ cooldown_seconds }}" style="display:flex;margin:0 auto 24px;min-width:280px">
+        <span class="cooldown-block__label">Ochilishigacha</span>
+        <span class="cooldown-block__time">--:--:--</span>
+        <span class="cooldown-block__sub">Soat : Daqiqa : Soniya</span>
+      </div>
+
+      <a href="{% url 'course_home' %}" class="btn btn--primary btn--full">← Kursga qaytish</a>
+
+    {% elif lock_reason == 'not_enrolled' %}
+      <div class="lock-card__icon">🔒</div>
+      <h1 class="lock-card__title">Bu modul kursning ichida</h1>
+      <p class="lock-card__text">
+        <strong style="color:var(--text)">{{ module.title }}</strong> — kursni ochish uchun bir martalik to'lov qiling.
+        Telegram orqali tezkor xizmat ko'rsatamiz.
+      </p>
+      <a href="https://t.me/bu_nurbek" target="_blank" rel="noopener" class="btn btn--primary btn--lg btn--full" style="margin-bottom:12px">
+        Telegram orqali to'lash
+      </a>
+      <a href="{% url 'course_home' %}" class="btn btn--ghost btn--full">← Kursga qaytish</a>
+
+    {% else %}
+      <div class="lock-card__icon">🔒</div>
+      <h1 class="lock-card__title">Avval oldingi modulni tugating</h1>
+      <p class="lock-card__text">
+        <strong style="color:var(--text)">{{ module.title }}</strong> moduliga kirish uchun
+        <strong style="color:var(--gold)">{{ prev_module.title }}</strong> modulining barcha videolarini tugating.
+      </p>
+
+      <div class="lock-card__progress">
+        <p class="lock-card__progress-label">Oldingi modul jarayoni</p>
+        <p class="lock-card__progress-value">{{ prev_done }} / {{ prev_total }} video tugatildi</p>
+        <div class="lock-card__progress-bar">
+          <div class="lock-card__progress-bar-fill" style="width:{% widthratio prev_done prev_total 100 %}%"></div>
+        </div>
+      </div>
+
+      {% if prev_module.lessons.exists %}
+        <a href="{% url 'lesson' prev_module.lessons.first.pk %}" class="btn btn--primary btn--full" style="margin-bottom:12px">
+          ▶ Oldingi modulga o'tish
+        </a>
+      {% endif %}
+      <a href="{% url 'course_home' %}" class="btn btn--ghost btn--full">← Kursga qaytish</a>
+    {% endif %}
+
+  </div>
+</div>
+
+{% if lock_reason == 'cooldown' %}
+<script>
+  function pad(n) { return String(n).padStart(2, '0'); }
+  const block = document.querySelector('.cooldown-block');
+  const secs = parseInt(block.dataset.cooldown || '0');
+  const display = block.querySelector('.cooldown-block__time');
+  const target = Date.now() + secs * 1000;
+  function tick() {
+    const remain = Math.max(0, Math.round((target - Date.now()) / 1000));
+    const h = Math.floor(remain / 3600);
+    const m = Math.floor((remain % 3600) / 60);
+    const s = remain % 60;
+    display.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    if (remain <= 0) { setTimeout(() => window.location.reload(), 1500); return; }
+    setTimeout(tick, 1000);
+  }
+  tick();
+</script>
+{% endif %}
+{% endblock %}

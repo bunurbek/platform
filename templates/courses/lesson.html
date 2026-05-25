@@ -1,0 +1,322 @@
+{% extends 'app_base.html' %}
+{% load static %}
+{% block title %}{{ lesson.title }} — Bu Nurbek{% endblock %}
+{% block nav_course %}app-nav__link--active{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/course.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="lesson-page" x-data="{ drawer: false, openModule: {{ module.pk }} }">
+
+  <!-- Mobile floating action button -->
+  <button class="lesson-fab" @click="drawer = true" aria-label="Darslar ro'yxati">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    Darslar
+  </button>
+
+  <!-- Mobile drawer backdrop -->
+  <div class="lesson-drawer-backdrop" :class="drawer ? 'lesson-drawer-backdrop--open' : ''"
+       @click="drawer = false"></div>
+
+  <!-- Mobile bottom drawer -->
+  <div class="lesson-drawer" :class="drawer ? 'lesson-drawer--open' : ''">
+    <div class="lesson-drawer__handle"></div>
+    <div class="lesson-drawer__head">
+      <div class="lesson-drawer__title">{{ course.title }}</div>
+      <button class="lesson-drawer__close" @click="drawer = false" aria-label="Yopish">×</button>
+    </div>
+    <div class="lesson-drawer__body">
+      {% for mo in modules_outline %}
+      <div class="lesson-sidebar__module {% if mo.is_current_module %}lesson-sidebar__module--current lesson-sidebar__module--open{% endif %}"
+           style="display:block">
+        <div class="lesson-sidebar__module-head" style="cursor:default">
+          <div style="flex:1">
+            <div class="lesson-sidebar__module-num">MODUL {{ mo.module.order|stringformat:"02d" }}</div>
+            <div class="lesson-sidebar__module-title">{{ mo.module.title }}</div>
+          </div>
+          {% if mo.is_accessible %}
+            {% if mo.lessons %}<span style="font-size:11px;color:var(--text-dim)">{{ mo.completed_lesson_ids|length }}/{{ mo.lessons|length }}</span>{% endif %}
+          {% else %}
+            <span style="font-size:12px;color:var(--text-dim)">🔒</span>
+          {% endif %}
+        </div>
+        <div class="lesson-sidebar__module-lessons" style="display:block">
+          {% for sl in mo.lessons %}
+            {% if mo.is_accessible %}
+            <a href="{% url 'lesson' sl.pk %}"
+               class="lesson-sidebar__lesson{% if sl.pk == lesson.pk %} lesson-sidebar__lesson--current{% endif %}">
+              <span class="lesson-sidebar__lesson-icon">
+                {% if sl.pk in mo.completed_lesson_ids %}<span style="color:var(--success)">✓</span>
+                {% elif sl.pk == lesson.pk %}<span style="color:var(--gold)">▶</span>
+                {% else %}<span>○</span>{% endif %}
+              </span>
+              <span style="flex:1">{{ sl.title }}</span>
+              <span style="font-size:11px;color:var(--text-dim)">{{ sl.duration_minutes }}m</span>
+            </a>
+            {% else %}
+            <div class="lesson-sidebar__lesson lesson-sidebar__lesson--locked">
+              <span class="lesson-sidebar__lesson-icon">🔒</span>
+              <span style="flex:1">{{ sl.title }}</span>
+              <span style="font-size:11px;color:var(--text-dim)">{{ sl.duration_minutes }}m</span>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Desktop sidebar -->
+  <aside class="lesson-sidebar">
+    <div class="lesson-sidebar__head">
+      <h3>{{ course.title }}</h3>
+      <a href="{% url 'course_home' %}" style="font-size:12px;color:var(--gold);margin-top:8px;display:inline-block">← Barcha modullar</a>
+    </div>
+
+    {% for mo in modules_outline %}
+    <div class="lesson-sidebar__module
+                {% if mo.is_current_module %}lesson-sidebar__module--current{% endif %}"
+         :class="openModule === {{ mo.module.pk }} ? 'lesson-sidebar__module--open' : ''">
+
+      <div class="lesson-sidebar__module-head"
+           @click="openModule = openModule === {{ mo.module.pk }} ? null : {{ mo.module.pk }}">
+        <div style="flex:1">
+          <div class="lesson-sidebar__module-num">MODUL {{ mo.module.order|stringformat:"02d" }}</div>
+          <div class="lesson-sidebar__module-title">{{ mo.module.title }}</div>
+        </div>
+        {% if mo.is_accessible %}
+          {% if mo.lessons %}
+          <span style="font-size:11px;color:var(--text-dim)">{{ mo.completed_lesson_ids|length }}/{{ mo.lessons|length }}</span>
+          {% endif %}
+        {% else %}
+          <span style="font-size:12px;color:var(--text-dim)">🔒</span>
+        {% endif %}
+      </div>
+
+      <div class="lesson-sidebar__module-lessons">
+        {% for sl in mo.lessons %}
+          {% if mo.is_accessible %}
+          <a href="{% url 'lesson' sl.pk %}"
+             class="lesson-sidebar__lesson
+                    {% if sl.pk == lesson.pk %}lesson-sidebar__lesson--current{% endif %}">
+            <span class="lesson-sidebar__lesson-icon">
+              {% if sl.pk in mo.completed_lesson_ids %}<span style="color:var(--success)">✓</span>
+              {% elif sl.pk == lesson.pk %}<span style="color:var(--gold)">▶</span>
+              {% else %}<span>○</span>
+              {% endif %}
+            </span>
+            <span style="flex:1">{{ sl.title }}</span>
+            <span style="font-size:11px;color:var(--text-dim)">{{ sl.duration_minutes }}m</span>
+          </a>
+          {% else %}
+          <div class="lesson-sidebar__lesson lesson-sidebar__lesson--locked">
+            <span class="lesson-sidebar__lesson-icon">🔒</span>
+            <span style="flex:1">{{ sl.title }}</span>
+            <span style="font-size:11px;color:var(--text-dim)">{{ sl.duration_minutes }}m</span>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </aside>
+
+  <!-- Main lesson area -->
+  <main class="lesson-main" x-data="lessonPage()">
+
+    <div class="lesson-header">
+      <p class="lesson-header__breadcrumb">Modul {{ module.order|stringformat:"02d" }} · {{ module.title }}</p>
+      <h1 class="lesson-header__title">{{ lesson.order }}. {{ lesson.title }}</h1>
+      <p class="lesson-header__meta">
+        {% if lesson.duration_minutes %}<span>⏱ {{ lesson.duration_minutes }} daqiqa</span>{% endif %}
+      </p>
+    </div>
+
+    <!-- Video -->
+    <div class="video-wrapper">
+      {% if lesson.video_url %}
+        <iframe src="{{ lesson.video_url }}" allowfullscreen></iframe>
+      {% elif lesson.video_file %}
+        <video controls controlsList="nodownload"
+               @ended="onVideoEnd()">
+          <source src="{{ lesson.video_file.url }}" type="video/mp4">
+        </video>
+      {% else %}
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-muted);text-align:center;padding:32px">
+          <div style="font-size:48px;margin-bottom:12px">🎬</div>
+          <p>Bu dars uchun video tez orada qo'shiladi</p>
+          {% if user.is_enrolled %}
+          <button @click="markComplete()" class="btn btn--primary btn--sm" style="margin-top:20px">
+            Darsni tugatildi deb belgilash
+          </button>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    {% if lesson.description %}
+    <p style="color:var(--text-muted);line-height:1.75;margin-bottom:24px;white-space:pre-line">{{ lesson.description }}</p>
+    {% endif %}
+
+    <!-- HOMEWORK — only shown when PDF is uploaded -->
+    {% if lesson.homework_pdf %}
+    <div class="homework-card">
+      <div class="homework-card__head">
+        <div class="homework-card__icon">📄</div>
+        <div style="flex:1;min-width:0">
+          <p class="homework-card__title">Uy vazifasi</p>
+          {% if lesson.homework_note %}
+          <p class="homework-card__note">{{ lesson.homework_note }}</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="homework-card__actions">
+        <a href="{{ lesson.homework_pdf.url }}" download class="btn btn--primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Vazifani yuklab olish
+        </a>
+        <a href="https://t.me/bu_nurbek" target="_blank" rel="noopener" class="btn btn--secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.48 14.62l-2.95-.924c-.64-.203-.654-.64.135-.95l11.57-4.461c.537-.194 1.006.131.327.963z"/></svg>
+          Telegram orqali yuborish
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Completion button -->
+    {% if user.is_enrolled %}
+    <div id="completion-area" style="margin-bottom:24px">
+      {% if progress and progress.completed %}
+        <div style="display:inline-flex;align-items:center;gap:10px;color:var(--success);font-weight:600;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.25);padding:10px 18px;border-radius:100px">
+          ✓ Dars tugatildi
+        </div>
+      {% else %}
+        <button id="complete-btn" @click="markComplete()" class="btn btn--secondary">
+          ✓ Darsni tugatildi deb belgilash
+        </button>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Module-just-completed banner -->
+    <div x-show="moduleJustCompleted && nextModuleUnlocked" x-cloak x-transition
+         class="module-locked-card"
+         style="background:linear-gradient(135deg,rgba(46,204,113,0.12),rgba(46,204,113,0.03));border-color:rgba(46,204,113,0.3)">
+      <div class="module-locked-card__icon">🎉</div>
+      <p class="module-locked-card__title">Modulni tugatdingiz!</p>
+      <p class="module-locked-card__text">Keyingi modul ochildi — davom etishga tayyormisiz?</p>
+      <a x-bind:href="nextModuleUrl" class="btn btn--primary">Keyingi modulga o'tish →</a>
+    </div>
+
+    <!-- Module-completed-but-cooldown banner -->
+    <div x-show="moduleJustCompleted && !nextModuleUnlocked && cooldownSeconds > 0" x-cloak x-transition
+         class="module-locked-card"
+         style="background:linear-gradient(135deg,rgba(93,173,226,0.12),rgba(93,173,226,0.03));border-color:rgba(93,173,226,0.3)">
+      <div class="module-locked-card__icon">🎉⏰</div>
+      <p class="module-locked-card__title">Zo'r — modulni tugatdingiz!</p>
+      <p class="module-locked-card__text">
+        Keyingi modul <strong style="color:#5dade2">24 soatdan keyin</strong> ochiladi.<br>
+        Bilim singdirish uchun bu vaqt kerak — bugun amaliyot qiling, ertaga keling.
+      </p>
+      <div class="cooldown-block" data-cooldown-live="true" style="display:flex;margin:0 auto 16px;min-width:260px">
+        <span class="cooldown-block__label">Ochilishigacha</span>
+        <span class="cooldown-block__time" x-text="cooldownDisplay">--:--:--</span>
+        <span class="cooldown-block__sub">Soat : Daqiqa : Soniya</span>
+      </div>
+      <a href="{% url 'course_home' %}" class="btn btn--ghost">Kurs sahifasiga qaytish</a>
+    </div>
+
+    <!-- Navigation -->
+    <div class="lesson-nav-btns">
+      {% if prev_lesson %}
+        <a href="{% url 'lesson' prev_lesson.pk %}" class="btn btn--ghost">← Oldingi</a>
+      {% else %}
+        <div class="placeholder"></div>
+      {% endif %}
+      {% if next_lesson %}
+        <a href="{% url 'lesson' next_lesson.pk %}" class="btn btn--primary">Keyingi dars →</a>
+      {% elif next_module and next_module.is_accessible %}
+        <a href="{% url 'lesson' next_module.lessons.first.pk %}" class="btn btn--primary">Keyingi modul →</a>
+      {% elif next_module %}
+        <a href="{% url 'course_home' %}" class="btn btn--ghost">Kurs sahifasiga qaytish</a>
+      {% else %}
+        <a href="{% url 'course_home' %}" class="btn btn--primary">🎉 Kursni tugatdingiz!</a>
+      {% endif %}
+    </div>
+
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function pad(n) { return String(n).padStart(2, '0'); }
+function fmtHMS(s) {
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return `${pad(h)}:${pad(m)}:${pad(sec)}`;
+}
+
+function lessonPage() {
+  return {
+    moduleJustCompleted: false,
+    nextModuleUnlocked: false,
+    nextModuleUrl: '/kurs/',
+    cooldownSeconds: 0,
+    cooldownDisplay: '--:--:--',
+    cooldownTimer: null,
+
+    async markComplete() {
+      try {
+        const res = await fetch('{% url "mark_complete" lesson.pk %}', {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
+        });
+        const data = await res.json();
+        if (data.completed) {
+          const area = document.getElementById('completion-area');
+          if (area) {
+            area.innerHTML = '<div style="display:inline-flex;align-items:center;gap:10px;color:var(--success);font-weight:600;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.25);padding:10px 18px;border-radius:100px">✓ Dars tugatildi</div>';
+          }
+          if (data.module_complete) {
+            this.moduleJustCompleted = true;
+            this.nextModuleUnlocked = !!data.next_module_unlocked;
+            if (data.next_module_unlocked && data.next_module_id) {
+              this.nextModuleUrl = '/kurs/';
+            } else if (data.cooldown_seconds && data.cooldown_seconds > 0) {
+              this.cooldownSeconds = data.cooldown_seconds;
+              this.startCountdown();
+            }
+          }
+        }
+      } catch (e) { console.error(e); }
+    },
+
+    startCountdown() {
+      const target = Date.now() + this.cooldownSeconds * 1000;
+      const tick = () => {
+        const remain = Math.max(0, Math.round((target - Date.now()) / 1000));
+        this.cooldownDisplay = fmtHMS(remain);
+        if (remain <= 0) {
+          if (this.cooldownTimer) clearTimeout(this.cooldownTimer);
+          // Optional: reload to show unlocked module
+          return;
+        }
+        this.cooldownTimer = setTimeout(tick, 1000);
+      };
+      tick();
+    },
+
+    onVideoEnd() {
+      if ({{ user.is_enrolled|yesno:"true,false" }}) {
+        this.markComplete();
+      }
+    },
+  }
+}
+</script>
+{% endblock %}

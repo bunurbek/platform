@@ -1,0 +1,448 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ═══════ HERO ═══════ -->
+<section class="hero">
+  <div class="hero__bg">
+    <div class="hero__gradient"></div>
+    <div class="hero__overlay"></div>
+  </div>
+  <div class="hero__content container">
+
+    <div class="hero__tag">
+      <span class="hero__tag-dot"></span>
+      <span>Yangi guruh ochiq</span>
+    </div>
+
+    <h1 class="hero__title">
+      <span class="word">Telefondan</span><br>
+      <span class="word text-gold">Sinematik</span><br>
+      <span class="word">Videografiyaga</span>
+    </h1>
+
+    <p class="hero__sub">
+      Hech qanday tajriba shart emas. Birinchi darsdan boshlab — kino sifatida video olishni o'rganasiz.
+    </p>
+
+    <div class="hero__cta-wrap">
+      <a href="{% url 'tg_start_view' %}" class="btn btn--primary btn--xl btn--pulse">
+        ▶ Birinchi darsni bepul ko'rish
+      </a>
+    </div>
+
+    <div class="hero__trust">
+      <span class="hero__avatars">
+        <img src="{% static 'images/kamron-photo.png' %}" alt="" loading="lazy">
+        <img src="{% static 'images/durdona-photo.jpg' %}" alt="" loading="lazy">
+        <img src="{% static 'images/ismigul-photo.jpg' %}" alt="" loading="lazy">
+      </span>
+      <span><strong style="color:var(--text)">300+</strong> talaba allaqachon o'qimoqda</span>
+      <span class="hero__trust-dot"></span>
+      <span>🎁 Birinchi dars bepul</span>
+    </div>
+
+  </div>
+
+  <div class="hero__scroll">
+    <span class="hero__scroll-text">Pastga</span>
+    <span class="hero__scroll-line"></span>
+  </div>
+</section>
+
+<!-- ═══════ TRUST STRIP — animated counters ═══════ -->
+<section class="trust-strip">
+  <div class="container">
+    <div class="trust-strip__inner">
+      <div class="trust-item">
+        <span class="trust-item__num"><span data-count="300" data-suffix="+">0</span></span>
+        <span class="trust-item__label">Talabalar</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-item__num"><span data-count="14">0</span></span>
+        <span class="trust-item__label">Modullar</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-item__num"><span data-count="5" data-suffix="+">0</span></span>
+        <span class="trust-item__label">Yil tajriba</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-item__num"><span data-count="150" data-suffix="+">0</span></span>
+        <span class="trust-item__label">Loyihalar</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ PAIN POINTS ═══════ -->
+<section class="pain" id="pain">
+  <div class="container">
+    <p class="section__tag fade-in">Tanish his?</p>
+    <h2 class="section__title fade-in">Bular sizga ham tanish?</h2>
+    <div class="pain__grid">
+      <div class="pain__item fade-in delay-1">
+        <div class="pain__icon">📱</div>
+        <p>Telefonda yozayapsiz, lekin natija <strong style="color:var(--text)">"havaskor"</strong> ko'rinadi</p>
+      </div>
+      <div class="pain__item fade-in delay-2">
+        <div class="pain__icon">🎨</div>
+        <p>Video tahrirlash murakkab — ranglar, audio, effektlar — nimadan boshlash noma'lum</p>
+      </div>
+      <div class="pain__item fade-in delay-3">
+        <div class="pain__icon">📷</div>
+        <p>Kamera bor, lekin sozlamalar va ishlatish usuli sirligicha qolgan</p>
+      </div>
+      <div class="pain__item fade-in delay-4">
+        <div class="pain__icon">💰</div>
+        <p>Videografiyadan daromad qilish istagi bor — <strong style="color:var(--text)">qaerdan boshlash?</strong></p>
+      </div>
+    </div>
+    <div class="pain__solution fade-in">
+      <p>Agar yuqoridagilardan biri tanish bo'lsa — <strong style="color:var(--gold)">bu kurs aynan siz uchun yaratilgan.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ INSTRUCTOR ═══════ -->
+<section class="instructor" id="instructor">
+  <div class="container">
+    <div class="instructor__layout">
+      <div class="instructor__media fade-in">
+        <div class="instructor__portrait">
+          <img src="{% static 'images/nurbek-portrait.jpeg' %}" alt="Nurbek Bahodirov">
+        </div>
+      </div>
+      <div class="instructor__info fade-in delay-1">
+        <p class="section__tag">Muallif</p>
+        <h2 class="instructor__name">Nurbek Bahodirov</h2>
+        <p class="instructor__bio">
+          5+ yil sinematik videografiya. Brendlar, to'ylar, reklama loyihalari. Endi — barcha sirlarni siz bilan baham ko'raman.
+          Kursda har bir texnika, har bir sozlama va har bir trick — <strong style="color:var(--text)">mening haqiqiy ishlarimdan</strong>.
+        </p>
+        <div class="instructor__stats">
+          <div class="stat-card">
+            <span class="stat-card__num">5<span style="font-size:0.6em">+</span></span>
+            <span class="stat-card__label">Yil tajriba</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__num">300<span style="font-size:0.6em">+</span></span>
+            <span class="stat-card__label">Talabalar</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__num">150<span style="font-size:0.6em">+</span></span>
+            <span class="stat-card__label">Loyihalar</span>
+          </div>
+        </div>
+        <a href="https://www.instagram.com/bu.nurbek/" target="_blank" rel="noopener"
+           class="btn btn--ghost btn--sm" style="margin-top:24px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          @bu.nurbek
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ NURBEK'S WORK — Instagram Reels ═══════ -->
+<section class="nurbek-work" id="ishlar">
+  <div class="container">
+    <p class="section__tag fade-in">Muallif ishlari</p>
+    <h2 class="section__title fade-in">Siz ham shunday ola olasiz</h2>
+    <div class="insta-grid">
+      <div class="insta-card fade-in delay-1">
+        <div class="insta-embed-wrap">
+          <iframe src="https://www.instagram.com/p/DVOlAsdDaHe/embed/captioned/"
+                  class="insta-iframe" frameborder="0" scrolling="no" loading="lazy"
+                  allowtransparency="true" allow="encrypted-media"></iframe>
+        </div>
+      </div>
+      <div class="insta-card fade-in delay-2">
+        <div class="insta-embed-wrap">
+          <iframe src="https://www.instagram.com/p/DVy3rPFCKLT/embed/captioned/"
+                  class="insta-iframe" frameborder="0" scrolling="no" loading="lazy"
+                  allowtransparency="true" allow="encrypted-media"></iframe>
+        </div>
+      </div>
+      <div class="insta-card fade-in delay-3">
+        <div class="insta-embed-wrap">
+          <iframe src="https://www.instagram.com/reel/DVGD5oNiIF8/embed/captioned/"
+                  class="insta-iframe" frameborder="0" scrolling="no" loading="lazy"
+                  allowtransparency="true" allow="encrypted-media"></iframe>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:36px" class="fade-in">
+      <a href="https://www.instagram.com/bu.nurbek/" target="_blank" rel="noopener" class="btn btn--ghost">
+        Barcha ishlarni ko'rish → @bu.nurbek
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ CURRICULUM — 14 modules ═══════ -->
+<section class="curriculum" id="kurs">
+  <div class="container">
+    <p class="section__tag fade-in">Kurs tarkibi</p>
+    <h2 class="section__title fade-in">{{ total_modules }} ta modul — A dan Z gacha</h2>
+    <div class="curriculum__grid">
+      {% for m in modules %}
+      <div class="curriculum__item fade-in {% cycle 'delay-1' 'delay-2' %}">
+        <span class="curriculum__num">{{ m.order|stringformat:"02d" }}</span>
+        <div style="flex:1">
+          <h3>
+            {{ m.title }}
+            {% if m.is_free %}<span style="display:inline-block;background:rgba(46,204,113,0.15);color:#2ECC71;border:1px solid rgba(46,204,113,0.3);padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-left:6px;vertical-align:middle">🎁 Bepul</span>{% endif %}
+          </h3>
+          <p>{{ m.description }}</p>
+          {% if m.lesson_count %}
+          <p style="font-size:12px;color:var(--text-dim);margin-top:6px;display:flex;align-items:center;gap:6px">
+            <span>🎬 {{ m.lesson_count }} video</span>
+            {% if m.total_duration %}<span>·</span><span>⏱ {{ m.total_duration }} daqiqa</span>{% endif %}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div style="text-align:center;margin-top:48px" class="fade-in">
+      <a href="{% url 'tg_start_view' %}" class="btn btn--primary btn--lg">
+        ▶ Birinchi modulni bepul boshlash
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ STUDENT WORK — autoplaying video tiles ═══════ -->
+<section class="student-work" id="talabalar">
+  <div class="container">
+    <p class="section__tag fade-in">Talabalar ishlari</p>
+    <h2 class="section__title fade-in">Kursdan keyin ular yaratayotgan ishlar</h2>
+    <div class="student-work__grid">
+
+      <div class="student-work__card fade-in delay-1">
+        <div class="student-work__video-wrap">
+          <video class="student-work__video" muted loop playsinline preload="metadata"
+                 poster="{% static 'images/durdona-work-poster.jpg' %}"
+                 onmouseenter="this.play()" onmouseleave="this.pause(); this.currentTime=0;">
+            <source src="{% static 'images/durdona-work.mp4' %}" type="video/mp4">
+          </video>
+          <button class="student-work__play" aria-label="Play">▶</button>
+        </div>
+        <div class="student-work__info">
+          <span class="student-work__name text-gold">Durdona</span>
+          <p>Rakurslarni o'zlashtirib, refletter bilan ishlashni o'rgandi</p>
+        </div>
+      </div>
+
+      <div class="student-work__card fade-in delay-2">
+        <div class="student-work__video-wrap">
+          <video class="student-work__video" muted loop playsinline preload="metadata"
+                 poster="{% static 'images/ismigul-work-poster.jpg' %}"
+                 onmouseenter="this.play()" onmouseleave="this.pause(); this.currentTime=0;">
+            <source src="{% static 'images/ismigul-work.mp4' %}" type="video/mp4">
+          </video>
+          <button class="student-work__play" aria-label="Play">▶</button>
+        </div>
+        <div class="student-work__info">
+          <span class="student-work__name text-gold">Ismigul</span>
+          <p>Kreativ rakurslar bilan video olishni o'rgandi</p>
+        </div>
+      </div>
+
+      <div class="student-work__card fade-in delay-3">
+        <div class="student-work__video-wrap">
+          <video class="student-work__video" muted loop playsinline preload="metadata"
+                 poster="{% static 'images/abdulloh-work-poster.jpg' %}"
+                 onmouseenter="this.play()" onmouseleave="this.pause(); this.currentTime=0;">
+            <source src="{% static 'images/abdulloh-work.mp4' %}" type="video/mp4">
+          </video>
+          <button class="student-work__play" aria-label="Play">▶</button>
+        </div>
+        <div class="student-work__info">
+          <span class="student-work__name text-gold">Abdulloh</span>
+          <p>Marketing komandasi bilan ishlamoqda</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ TESTIMONIALS — real student feedback ═══════ -->
+<section class="testimonials" id="testimonials">
+  <div class="container">
+    <p class="section__tag fade-in">Haqiqiy fikrlar</p>
+    <h2 class="section__title fade-in">Talabalar o'z so'zlari bilan</h2>
+    <div class="testimonials__grid">
+
+      <!-- Abdulloh — Cyrillic Uzbek, no profile pic (letter A) -->
+      <div class="testimonial-card fade-in delay-1">
+        <span class="testimonial-card__result">💼 Marketing komandada ishlamoqda</span>
+        <p class="testimonial-card__text">
+          "Нурбек ака рахмат сизга, шу сохага киришимга ва видеография сохасида бемалол иши қилолидиган бўлишимга сабабчи бўп қолгансиз ака. Камерани ронинда ишлашни, статик кадр, динамичный кадр — ҳамма ҳаммасини ўргатганиз учун ҳозир маркетинг команда билан ишлавоман, ҳозирги натижаларим зўр ака. Бу ростан холис фикрларим сизга бўлган."
+        </p>
+        <div class="testimonial-card__author">
+          <div class="testimonial-card__avatar testimonial-card__avatar--letter">A</div>
+          <div>
+            <strong>Abdulloh</strong>
+            <span>Videograf · Marketing komandasi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ismigul -->
+      <div class="testimonial-card fade-in delay-2">
+        <span class="testimonial-card__result">🎬 Rakurslarni o'zlashtirdi</span>
+        <p class="testimonial-card__text">
+          "Camerada video olardim, lekin nima qanday ishlashini yaxshi bilmasdim. Kursda batafsilroq tushundim — ancha yaxshilandi kamerani ishlatishim. Qanaqa rakursladan olish mumkinligini bilmasdim, har xil rakurslarni o'rgandim. Oddiy rakurslada video olardim o'zimga — endi har xil rakurslarda kreativroq qilib olaman 🤓"
+        </p>
+        <div class="testimonial-card__author">
+          <img src="{% static 'images/ismigul-photo.jpg' %}" alt="Ismigul" loading="lazy">
+          <div>
+            <strong>Ismigul</strong>
+            <span>Kontent kreator</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Durdona — merged her two messages -->
+      <div class="testimonial-card fade-in delay-3">
+        <span class="testimonial-card__result">📸 Refletter va rakurslar</span>
+        <p class="testimonial-card__text">
+          "Darsla zo'r bo'p o'tvoti 🤓 Camerada ishlavoman dib yurganakanman 🫠 — o'qish davomida hamma xatolarim ayni bilindi o'zimga. Otrajatel bn ishlashga umuman qiziqmaganakanman, kecha ishlab nima uchun ishlatilinishini bilvoldim 🤣. Kurs 100% pulini oqlavoti dib bemalol aytoliman. Sizi sherigim tavsiya qildi, e'tiborimi tortgani — boshqalarga o'xshab qop-qop bida bermaysiz, 'man o'zim bilganlarimi o'rgataman' dedis — shu bilan bo'ldi, zo'r o'qiman dedim."
+        </p>
+        <div class="testimonial-card__author">
+          <img src="{% static 'images/durdona-photo.jpg' %}" alt="Durdona" loading="lazy">
+          <div>
+            <strong>Durdona</strong>
+            <span>Videograf</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kamron -->
+      <div class="testimonial-card fade-in delay-4">
+        <span class="testimonial-card__result">🚀 Shaxsiy brend qurdi</span>
+        <p class="testimonial-card__text">
+          "Konsultatsiya juda foydali bo'ldi. Videograf sifatida shaxsiy brend qilish, qanday kontent turlari orqali xizmatimni o'zimga kerakli auditoriyaga yetkazishni bilib oldim. Undan tashqari sotuv qilishni yana bir nechta yo'llarini o'rganib oldim."
+        </p>
+        <div class="testimonial-card__author">
+          <img src="{% static 'images/kamron-photo.png' %}" alt="Kamron" loading="lazy">
+          <div>
+            <strong>Kamron</strong>
+            <span>Videograf, Toshkent</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FREE TRIAL PUSH (replaces pricing) ═══════ -->
+<section class="pricing" id="boshlash">
+  <div class="container">
+    <p class="section__tag fade-in">Bepul boshlash</p>
+    <h2 class="section__title fade-in">Hozir boshlang — bepul</h2>
+    <div class="pricing__card fade-in" style="text-align:center;position:relative;z-index:1">
+      <div style="font-size:56px;margin-bottom:12px">🎁</div>
+      <h3 style="font-family:var(--font-head);font-size:24px;font-weight:800;margin-bottom:12px;letter-spacing:-0.02em">
+        Birinchi modul — to'liq bepul
+      </h3>
+      <p style="color:var(--text-muted);margin-bottom:28px;line-height:1.65;font-size:16px">
+        Majburiyat yo'q. To'lov yo'q. Avval darsning sifatini ko'ring — keyin qarorni qabul qiling.
+      </p>
+      <ul class="pricing__features" style="text-align:left;margin-bottom:28px">
+        <li><span style="color:var(--success)">✓</span> Telegram orqali 30 soniyada kirish</li>
+        <li><span style="color:var(--success)">✓</span> Email yoki parol shart emas</li>
+        <li><span style="color:var(--success)">✓</span> To'liq dars — qisqartilmagan</li>
+        <li><span style="color:var(--success)">✓</span> Telefoningizda yoki kompyuteringizda</li>
+      </ul>
+      <a href="{% url 'tg_start_view' %}" class="btn btn--primary btn--xl btn--full btn--pulse">
+        ▶ Bepul boshlash
+      </a>
+      <p style="font-size:12px;color:var(--text-dim);margin-top:14px">
+        Birinchi modulni tugatganingizdan so'ng to'liq kurs taklif qilinadi
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FAQ ═══════ -->
+<section class="faq" id="faq" x-data="{ active: null }">
+  <div class="container">
+    <p class="section__tag fade-in">Savol-Javob</p>
+    <h2 class="section__title fade-in">Ko'p so'raladigan savollar</h2>
+    <div class="faq__list">
+      <div class="faq__item fade-in delay-1" :class="active === 0 ? 'faq__item--open' : ''">
+        <button class="faq__q" @click="active = active === 0 ? null : 0">
+          Kurs qancha davom etadi? <span class="faq__icon">+</span>
+        </button>
+        <div class="faq__a" x-show="active === 0" x-transition>
+          <p>Kurs 14 moduldan iborat. Har bir modul — alohida texnikani to'liq qamrab oladi. O'z tempingizda o'rganasiz, muddat cheklanmagan. Umrbod kirish huquqi.</p>
+        </div>
+      </div>
+      <div class="faq__item fade-in delay-1" :class="active === 1 ? 'faq__item--open' : ''">
+        <button class="faq__q" @click="active = active === 1 ? null : 1">
+          Qanday qurilma kerak bo'ladi? <span class="faq__icon">+</span>
+        </button>
+        <div class="faq__a" x-show="active === 1" x-transition>
+          <p>Boshlash uchun faqat smartphone yetarli. Kurs davomida professional kameralar (Sony, Canon) bilan ham ishlashni o'rganasiz. Davinci Resolve — bepul.</p>
+        </div>
+      </div>
+      <div class="faq__item fade-in delay-1" :class="active === 2 ? 'faq__item--open' : ''">
+        <button class="faq__q" @click="active = active === 2 ? null : 2">
+          Bepul dars qachondan ochiladi? <span class="faq__icon">+</span>
+        </button>
+        <div class="faq__a" x-show="active === 2" x-transition>
+          <p>Hozir — bir daqiqada. Telegram bot orqali ro'yxatdan o'tasiz va birinchi modul darhol boshlanadi.</p>
+        </div>
+      </div>
+      <div class="faq__item fade-in delay-1" :class="active === 3 ? 'faq__item--open' : ''">
+        <button class="faq__q" @click="active = active === 3 ? null : 3">
+          Agar tushunmasam nima qilaman? <span class="faq__icon">+</span>
+        </button>
+        <div class="faq__a" x-show="active === 3" x-transition>
+          <p>Telegram guruhimizda muallif va boshqa talabalar bilan bevosita muloqot qilasiz. Savollaringizga 24 soat ichida javob beriladi.</p>
+        </div>
+      </div>
+      <div class="faq__item fade-in delay-1" :class="active === 4 ? 'faq__item--open' : ''">
+        <button class="faq__q" @click="active = active === 4 ? null : 4">
+          Kursdan keyin pul ishlay olamanmi? <span class="faq__icon">+</span>
+        </button>
+        <div class="faq__a" x-show="active === 4" x-transition>
+          <p>Ha. Maxsus "Monetizatsiya" moduli — mijozlarni qanday topish, narxni belgilash, portfolio qurish va shaxsiy brendni o'rganasiz. Bizning talabalarning ko'pchiligi 2-3 oyda birinchi buyurtmani oladi.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FINAL CTA ═══════ -->
+<section class="final-cta">
+  <div class="container">
+    <h2 class="final-cta__title fade-in">Hozir bepul boshlang</h2>
+    <p class="final-cta__sub fade-in delay-1">
+      Bir daqiqadan keyin siz birinchi darsni ko'rayotgan bo'lasiz.<br>
+      Kichik qadam — katta o'zgarish.
+    </p>
+    <div class="fade-in delay-2">
+      <a href="{% url 'tg_start_view' %}" class="btn btn--primary btn--xl btn--pulse">
+        ▶ Birinchi darsni bepul ko'rish
+      </a>
+    </div>
+    <p class="final-cta__trust fade-in delay-3">
+      🎁 Majburiyat yo'q · 🚀 30 soniyada kirish · 📱 Telegram orqali
+    </p>
+  </div>
+</section>
+
+<!-- ═══════ SMART MOBILE STICKY CTA ═══════ -->
+<div class="mobile-cta">
+  <a href="{% url 'tg_start_view' %}" class="btn btn--primary btn--full btn--lg">
+    ▶ Bepul birinchi dars
+  </a>
+</div>
+
+{% endblock %}

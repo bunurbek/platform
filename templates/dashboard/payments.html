@@ -1,0 +1,74 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}To'lovlar{% endblock %}
+{% block page_title %}To'lovlar jurnali{% endblock %}
+{% block nav_payments %}dash-nav__item--active{% endblock %}
+
+{% block content %}
+
+<div class="dash-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+  <div class="dash-stat">
+    <p class="dash-stat__label">Jami daromad</p>
+    <p class="dash-stat__value--green dash-stat__value">${{ total }}</p>
+  </div>
+  <div class="dash-stat">
+    <p class="dash-stat__label">To'lovlar soni</p>
+    <p class="dash-stat__value--white dash-stat__value">{{ records|length }}</p>
+  </div>
+  <div class="dash-stat">
+    <p class="dash-stat__label">O'rtacha to'lov</p>
+    <p class="dash-stat__value">{% if records|length %}${% widthratio total records|length 1 %}{% else %}$0{% endif %}</p>
+  </div>
+</div>
+
+<div class="dash-table-wrap">
+  <div class="dash-table-header">
+    <span class="dash-table-header__title">Barcha to'lovlar</span>
+  </div>
+  <div class="dash-table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th>Talaba</th>
+        <th>Miqdor</th>
+        <th>To'lov ma'lumoti</th>
+        <th>To'lov sanasi</th>
+        <th>Qabul qildi</th>
+        <th>Izoh</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in records %}
+      <tr>
+        <td>
+          <a href="{% url 'dash_student_detail' r.user.pk %}" style="color:#F0F0F0;font-weight:600">
+            {{ r.user.display_name }}
+          </a>
+          <div style="font-size:12px;color:#606060">{{ r.user.email }}</div>
+        </td>
+        <td>
+          <span style="font-weight:700;color:#2ECC71;font-size:16px">${{ r.amount }}</span>
+          <span style="font-size:12px;color:#606060"> {{ r.currency }}</span>
+        </td>
+        <td>
+          <span class="badge badge--blue">{{ r.payment_reference }}</span>
+        </td>
+        <td style="font-size:13px;color:#808080">{{ r.payment_date|date:"d M Y" }}</td>
+        <td style="font-size:13px;color:#606060">{{ r.recorded_by.display_name|default:"—" }}</td>
+        <td style="font-size:13px;color:#606060">{{ r.notes|default:"—" }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6">
+          <div class="empty-state">
+            <div class="empty-state__icon">💳</div>
+            <p class="empty-state__text">Hali to'lovlar yozilmagan</p>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+{% endblock %}

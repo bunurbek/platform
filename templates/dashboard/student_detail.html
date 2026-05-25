@@ -1,0 +1,111 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}{{ student.display_name }}{% endblock %}
+{% block page_title %}{{ student.display_name }}{% endblock %}
+{% block nav_students %}dash-nav__item--active{% endblock %}
+
+{% block content %}
+
+<div style="margin-bottom:20px">
+  <a href="{% url 'dash_students' %}" class="dash-btn dash-btn--gray">← Orqaga</a>
+</div>
+
+<div class="dash-grid-detail">
+
+  <!-- Profile card -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="dash-table-wrap" style="padding:24px">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+        <div class="dash-avatar" style="width:52px;height:52px;font-size:20px">{{ student.display_name|first|upper }}</div>
+        <div>
+          <p style="font-weight:700;font-size:16px;color:#F0F0F0">{{ student.display_name }}</p>
+          <p style="font-size:13px;color:#606060">{{ student.email }}</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#606060">Telefon</span>
+          <span>{{ student.phone|default:"—" }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#606060">Ro'yxat sanasi</span>
+          <span>{{ student.created_at|date:"d M Y" }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#606060">Holat</span>
+          {% if student.is_enrolled %}
+          <span class="badge badge--green">✓ Faol</span>
+          {% else %}
+          <span class="badge badge--yellow">Kutayapti</span>
+          {% endif %}
+        </div>
+        {% if student.enrolled_at %}
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#606060">Qabul sanasi</span>
+          <span>{{ student.enrolled_at|date:"d M Y" }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Payment history -->
+    <div class="dash-table-wrap" style="padding:24px">
+      <p style="font-size:13px;text-transform:uppercase;letter-spacing:2px;color:#606060;margin-bottom:16px">To'lovlar</p>
+      {% for p in payments %}
+      <div style="border:1px solid #252525;border-radius:8px;padding:14px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-weight:700;color:#2ECC71">${{ p.amount }}</span>
+          <span style="font-size:12px;color:#606060">{{ p.payment_date|date:"d M Y" }}</span>
+        </div>
+        <p style="font-size:13px;color:#808080">{{ p.payment_reference }}</p>
+        {% if p.notes %}<p style="font-size:12px;color:#606060;margin-top:4px">{{ p.notes }}</p>{% endif %}
+      </div>
+      {% empty %}
+      <p style="color:#606060;font-size:14px">To'lovlar yozilmagan</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Lesson progress -->
+  <div class="dash-table-wrap">
+    <div class="dash-table-header">
+      <span class="dash-table-header__title">Dars jarayoni</span>
+      {% if lessons %}
+      <span style="font-size:13px;color:#606060">
+        {{ progress_map.values|length }}/{{ lessons|length }} tugallandi
+      </span>
+      {% endif %}
+    </div>
+    {% if student.is_enrolled %}
+    <div class="dash-table-scroll">
+    <table>
+      <thead><tr><th>Modul</th><th>#</th><th>Dars</th><th>Holat</th></tr></thead>
+      <tbody>
+        {% for lesson in lessons %}
+        <tr>
+          <td style="color:#A0A0A0;font-size:13px">M{{ lesson.module.order }}</td>
+          <td style="color:#606060;font-size:13px">{{ lesson.order }}</td>
+          <td style="font-weight:500;color:#F0F0F0">{{ lesson.title }}</td>
+          <td>
+            {% if lesson.pk in progress_map %}
+              <span class="badge badge--green">✓ Tugallandi</span>
+            {% else %}
+              <span class="badge badge--gray">Ko'rilmagan</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" style="text-align:center;color:#606060;padding:24px">Darslar qo'shilmagan</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state__icon">🔒</div>
+      <p class="empty-state__text">Talaba hali kursga qabul qilinmagan</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

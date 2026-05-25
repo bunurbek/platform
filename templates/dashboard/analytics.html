@@ -1,0 +1,81 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Analitika{% endblock %}
+{% block page_title %}Analitika{% endblock %}
+{% block nav_analytics %}dash-nav__item--active{% endblock %}
+
+{% block content %}
+
+<div class="dash-stats" style="grid-template-columns:repeat(2,1fr);margin-bottom:24px">
+  <div class="dash-stat">
+    <p class="dash-stat__label">Jami daromad</p>
+    <p class="dash-stat__value--green dash-stat__value">${{ total_revenue }}</p>
+  </div>
+  <div class="dash-stat">
+    <p class="dash-stat__label">Jami faol talabalar</p>
+    <p class="dash-stat__value--white dash-stat__value">{{ total_enrolled }}</p>
+  </div>
+</div>
+
+<div class="dash-grid-2col" style="margin-bottom:20px">
+
+  <!-- Enrollments chart -->
+  <div class="dash-table-wrap" style="padding:28px">
+    <p style="font-size:13px;text-transform:uppercase;letter-spacing:2px;color:#606060;margin-bottom:24px">So'nggi 6 oy — Qabul</p>
+    <div id="enroll-chart" class="bar-chart"></div>
+  </div>
+
+  <!-- Revenue chart -->
+  <div class="dash-table-wrap" style="padding:28px">
+    <p style="font-size:13px;text-transform:uppercase;letter-spacing:2px;color:#606060;margin-bottom:24px">So'nggi 6 oy — Daromad ($)</p>
+    <div id="revenue-chart" class="bar-chart"></div>
+  </div>
+
+</div>
+
+<!-- Lesson completion -->
+<div class="dash-table-wrap">
+  <div class="dash-table-header">
+    <span class="dash-table-header__title">Darslar tugallanishi (faol talabalar orasida)</span>
+  </div>
+  <div style="padding:24px;display:flex;flex-direction:column;gap:12px">
+    {% for stat in lesson_stats %}
+    <div class="lesson-stat-row">
+      <span class="lesson-stat-row__title">{{ stat.title }}</span>
+      <div class="lesson-stat-row__bar">
+        <div class="lesson-stat-row__bar-fill" style="width:{{ stat.pct }}%"></div>
+      </div>
+      <span class="lesson-stat-row__pct">{{ stat.pct }}%</span>
+      <span class="lesson-stat-row__count">{{ stat.done }} ta</span>
+    </div>
+    {% empty %}
+    <p style="color:#606060;text-align:center;padding:24px">Ma'lumot yo'q</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const months = {{ months_data|safe }};
+const maxEnroll = Math.max(...months.map(m=>m.enrollments), 1);
+const maxRev    = Math.max(...months.map(m=>m.revenue), 1);
+
+function buildChart(id, key, max, prefix) {
+  const el = document.getElementById(id);
+  months.forEach(m => {
+    const val = m[key];
+    const pct = Math.round((val / max) * 100);
+    el.innerHTML += `
+      <div class="bar-chart__item">
+        <span class="bar-chart__val">${prefix}${val}</span>
+        <div class="bar-chart__bar" style="height:${Math.max(pct,3)}%"></div>
+        <span class="bar-chart__label">${m.label}</span>
+      </div>`;
+  });
+}
+
+buildChart('enroll-chart', 'enrollments', maxEnroll, '');
+buildChart('revenue-chart', 'revenue', maxRev, '$');
+</script>
+{% endblock %}

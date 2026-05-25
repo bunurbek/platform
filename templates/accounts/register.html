@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Ro'yxatdan o'tish — Bu Nurbek{% endblock %}
+{% block content %}
+<div class="form-page">
+  <div class="form-card">
+    <h1 class="form-card__title">Ro'yxatdan o'ting</h1>
+    <p class="form-card__sub">Kursga kirish uchun account yarating</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        <input class="form-input{% if field.errors %} form-input--error{% endif %}"
+               type="{{ field.field.widget.input_type }}"
+               name="{{ field.html_name }}"
+               id="{{ field.id_for_label }}"
+               placeholder="{{ field.field.widget.attrs.placeholder|default:'' }}"
+               autocomplete="{{ field.field.widget.attrs.autocomplete|default:'' }}"
+               value="{% if field.field.widget.input_type != 'password' %}{{ field.value|default:'' }}{% endif %}">
+        {% for error in field.errors %}
+        <span class="form-error">{{ error }}</span>
+        {% endfor %}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn--primary btn--full" style="margin-top:8px">
+        Ro'yxatdan o'tish
+      </button>
+    </form>
+    <p class="form-footer">Hisobingiz bormi? <a href="{% url 'login' %}">Kirish</a></p>
+  </div>
+</div>
+{% endblock %}

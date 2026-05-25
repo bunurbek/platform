@@ -1,0 +1,100 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Bosh sahifa{% endblock %}
+{% block page_title %}Bosh sahifa{% endblock %}
+{% block nav_home %}dash-nav__item--active{% endblock %}
+
+{% block content %}
+
+<!-- Stats grid -->
+<div class="dash-stats">
+  <div class="dash-stat">
+    <p class="dash-stat__label">Jami talabalar</p>
+    <p class="dash-stat__value--white dash-stat__value">{{ total_users }}</p>
+    <p class="dash-stat__sub">+{{ new_this_week }} bu hafta</p>
+  </div>
+  <div class="dash-stat">
+    <p class="dash-stat__label">Faol (to'lagan)</p>
+    <p class="dash-stat__value--green dash-stat__value">{{ enrolled }}</p>
+    <p class="dash-stat__sub">Kirish faol</p>
+  </div>
+  <div class="dash-stat">
+    <p class="dash-stat__label">Kutayotganlar</p>
+    <p class="dash-stat__value">{{ pending }}</p>
+    <p class="dash-stat__sub">To'lov tasdiqlanmagan</p>
+  </div>
+  <div class="dash-stat">
+    <p class="dash-stat__label">Oy daromadi</p>
+    <p class="dash-stat__value--green dash-stat__value">${{ revenue_month }}</p>
+    <p class="dash-stat__sub">Jami: ${{ revenue_total }}</p>
+  </div>
+</div>
+
+<div class="dash-grid-2col">
+
+  <!-- Recent signups -->
+  <div class="dash-table-wrap">
+    <div class="dash-table-header">
+      <span class="dash-table-header__title">So'nggi ro'yxatdan o'tganlar</span>
+      <a href="{% url 'dash_students' %}" class="dash-btn dash-btn--gray">Hammasini ko'rish</a>
+    </div>
+    <div class="dash-table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Ism</th>
+          <th>Sana</th>
+          <th>Holat</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in recent_users %}
+        <tr>
+          <td>
+            <a href="{% url 'dash_student_detail' u.pk %}" style="color:#F0F0F0;font-weight:500">{{ u.display_name }}</a>
+            <div style="font-size:12px;color:#606060">{{ u.email }}</div>
+          </td>
+          <td style="color:#606060;font-size:13px">{{ u.created_at|date:"d M" }}</td>
+          <td>
+            {% if u.is_enrolled %}
+            <span class="badge badge--green">Faol</span>
+            {% else %}
+            <span class="badge badge--yellow">Kutayapti</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" style="text-align:center;color:#606060;padding:32px">Hali talabalar yo'q</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="dash-table-wrap" style="padding:24px">
+      <p style="font-size:13px;text-transform:uppercase;letter-spacing:2px;color:#606060;margin-bottom:16px">Tezkor harakatlar</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="{% url 'dash_students' %}?status=pending" class="dash-btn dash-btn--gold" style="padding:14px 16px;font-size:14px;border-radius:10px">
+          👥 Kutayotgan talabalar ({{ pending }})
+        </a>
+        <a href="{% url 'dash_content' %}" class="dash-btn dash-btn--blue" style="padding:14px 16px;font-size:14px;border-radius:10px">
+          🎬 Darslarni boshqarish
+        </a>
+        <a href="{% url 'dash_payments' %}" class="dash-btn dash-btn--green" style="padding:14px 16px;font-size:14px;border-radius:10px">
+          💳 To'lovlar jurnali
+        </a>
+        <a href="{% url 'dash_analytics' %}" class="dash-btn dash-btn--gray" style="padding:14px 16px;font-size:14px;border-radius:10px">
+          📊 Analitika
+        </a>
+      </div>
+    </div>
+    <div class="dash-table-wrap" style="padding:24px">
+      <p style="font-size:13px;text-transform:uppercase;letter-spacing:2px;color:#606060;margin-bottom:12px">O'rtacha tugallanish</p>
+      <div style="font-family:'Montserrat',sans-serif;font-size:48px;font-weight:900;color:#E8B84B;line-height:1">{{ avg_completion }}%</div>
+      <p style="font-size:13px;color:#606060;margin-top:4px">Faol talabalar orasida</p>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

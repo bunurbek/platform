@@ -1,0 +1,83 @@
+# DigitalOcean App Platform spec
+# Deploy: doctl apps create --spec .do/app.yaml
+# Or paste into the DO dashboard → Create App → Spec mode.
+# Replace GITHUB_USERNAME/REPO_NAME and the secret values before deploying.
+
+name: bunurbek-platform
+region: fra  # Frankfurt (closest to Uzbekistan); fra/ams/lon — pick lowest latency
+
+services:
+  - name: web
+    github:
+      repo: bunurbek/platform
+      branch: main
+      deploy_on_push: true
+    source_dir: /
+    build_command: pip install -r requirements.txt
+    run_command: gunicorn config.wsgi --workers 2 --threads 4 --timeout 60 --bind 0.0.0.0:$PORT --log-file -
+    instance_size_slug: basic-xxs   # $5/mo — bump to basic-xs if traffic grows
+    instance_count: 1
+    http_port: 8080
+    routes:
+      - path: /
+    health_check:
+      http_path: /
+    envs:
+      - {key: DJANGO_SETTINGS_MODULE, value: "config.settings"}
+      - {key: DEBUG, value: "False"}
+      - {key: ALLOWED_HOSTS, value: "${APP_DOMAIN},${_self.DEFAULT_INGRESS_HOSTNAME}"}
+      - {key: CSRF_TRUSTED_ORIGINS, value: "https://${APP_DOMAIN},https://${_self.DEFAULT_INGRESS_HOSTNAME}"}
+      - {key: SITE_URL, value: "https://${APP_DOMAIN}"}
+      - {key: SECRET_KEY, type: SECRET, value: "REPLACE_WITH_50_CHAR_RANDOM_STRING"}
+      - {key: TELEGRAM_BOT_TOKEN, type: SECRET, value: "REPLACE_WITH_BOT_TOKEN"}
+      - {key: TELEGRAM_BOT_USERNAME, value: "bunurbekauth_bot"}
+      - {key: MODULE_COOLDOWN_SECONDS, value: "86400"}
+      # Cloudflare R2 — toggle USE_R2 to true after creating the bucket
+      - {key: USE_R2, value: "False"}
+      - {key: R2_ACCESS_KEY_ID, type: SECRET, value: ""}
+      - {key: R2_SECRET_ACCESS_KEY, type: SECRET, value: ""}
+      - {key: R2_BUCKET_NAME, value: "bunurbek-media"}
+      - {key: R2_ENDPOINT_URL, value: ""}
+      - {key: R2_PUBLIC_URL, value: ""}
+      # DB url auto-injected via the database binding below
+      - {key: DATABASE_URL, value: "${db.DATABASE_URL}"}
+
+workers:
+  - name: telegram-bot
+    github:
+      repo: bunurbek/platform
+      branch: main
+    source_dir: /
+    build_command: pip install -r requirements.txt
+    run_command: python manage.py run_telegram_bot
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    envs:
+      - {key: DJANGO_SETTINGS_MODULE, value: "config.settings"}
+      - {key: DEBUG, value: "False"}
+      - {key: SECRET_KEY, type: SECRET, value: "REPLACE_WITH_SAME_AS_WEB"}
+      - {key: TELEGRAM_BOT_TOKEN, type: SECRET, value: "REPLACE_WITH_BOT_TOKEN"}
+      - {key: TELEGRAM_BOT_USERNAME, value: "bunurbekauth_bot"}
+      - {key: SITE_URL, value: "https://${APP_DOMAIN}"}
+      - {key: DATABASE_URL, value: "${db.DATABASE_URL}"}
+
+jobs:
+  - name: migrate
+    kind: PRE_DEPLOY
+    github:
+      repo: bunurbek/platform
+      branch: main
+    source_dir: /
+    build_command: pip install -r requirements.txt
+    run_command: python manage.py migrate --noinput && python manage.py collectstatic --noinput
+    instance_size_slug: basic-xxs
+    envs:
+      - {key: DJANGO_SETTINGS_MODULE, value: "config.settings"}
+      - {key: SECRET_KEY, type: SECRET, value: "REPLACE_WITH_SAME_AS_WEB"}
+      - {key: DATABASE_URL, value: "${db.DATABASE_URL}"}
+
+databases:
+  - name: db
+    engine: PG
+    version: "16"
+    production: false   # dev tier — free during preview, ~$15/mo when production. Switch to true later.

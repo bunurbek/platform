@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% block title %}Telegram kutilmoqda — Bu Nurbek{% endblock %}
+{% block content %}
+<div class="form-page">
+  <div class="form-card" style="text-align:center" x-data="tgWaiting()" x-init="init()">
+
+    <!-- Pending → telegram bot not opened yet -->
+    <div x-show="state === 'pending'" x-cloak>
+      <div style="font-size:48px;margin-bottom:16px">📱</div>
+      <h1 class="form-card__title">Telegramda START tugmasini bosing</h1>
+      <p class="form-card__sub" style="margin-bottom:24px">
+        Telegram avtomatik ochilishi kerak. Agar ochilmagan bo'lsa:
+      </p>
+      <a href="{{ tg_link }}" target="_blank" rel="noopener" class="btn btn--primary btn--full">
+        Telegram botni ochish
+      </a>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px;color:#606060;font-size:13px">
+        <div class="loader"></div>
+        <span>Telegram javobini kutmoqda...</span>
+      </div>
+    </div>
+
+    <!-- Awaiting contact -->
+    <div x-show="state === 'awaiting_contact'" x-cloak>
+      <div style="font-size:48px;margin-bottom:16px">📞</div>
+      <h1 class="form-card__title">Telefon raqamingizni ulashing</h1>
+      <p class="form-card__sub" style="margin-bottom:24px">
+        <span x-text="welcomeText"></span><br>
+        Bot sizdan telefon so'radi — pastdagi tugmani bosing
+      </p>
+      <div class="step-status">
+        <div class="step done"><span>1</span> Telegram ochildi</div>
+        <div class="step active"><span>2</span> Telefon raqami</div>
+        <div class="step"><span>3</span> Ism</div>
+      </div>
+    </div>
+
+    <!-- Awaiting name -->
+    <div x-show="state === 'awaiting_name'" x-cloak>
+      <div style="font-size:48px;margin-bottom:16px">✍️</div>
+      <h1 class="form-card__title">Ism va familiyangizni yozing</h1>
+      <p class="form-card__sub" style="margin-bottom:24px">
+        Telefon qabul qilindi: <span style="color:#2ECC71" x-text="phone"></span><br>
+        Endi botda ism va familiyangizni yozing
+      </p>
+      <div class="step-status">
+        <div class="step done"><span>1</span> Telegram</div>
+        <div class="step done"><span>2</span> Telefon</div>
+        <div class="step active"><span>3</span> Ism</div>
+      </div>
+    </div>
+
+    <!-- Ready — auth button sent -->
+    <div x-show="state === 'ready'" x-cloak>
+      <div style="font-size:48px;margin-bottom:16px">🚀</div>
+      <h1 class="form-card__title">Botdagi tugmani bosing!</h1>
+      <p class="form-card__sub" style="margin-bottom:24px">
+        Salom, <strong style="color:#F0F0F0" x-text="name"></strong>!<br>
+        Telegramdagi <strong style="color:#E8B84B">Saytda davom etish</strong> tugmasini bosing.
+      </p>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;color:#A0A0A0;font-size:13px">
+        <div class="loader"></div>
+        <span>Tasdiqlash kutilmoqda...</span>
+      </div>
+    </div>
+
+    <!-- Verified — auto-login -->
+    <div x-show="state === 'verified'" x-cloak>
+      <div style="font-size:48px;margin-bottom:16px">✅</div>
+      <h1 class="form-card__title">Tayyor! Dars yuklanmoqda...</h1>
+    </div>
+
+    <!-- Expired -->
+    <div x-show="state === 'expired'" x-cloak>
+      <div style="font-size:48px;margin-bottom:16px">⏱</div>
+      <p style="color:#e74c3c;margin:24px 0">Sessiya muddati o'tdi (10 daqiqa).</p>
+      <a href="{% url 'tg_start_view' %}" class="btn btn--primary">Qaytadan boshlash</a>
+    </div>
+
+    <!-- No session -->
+    <div x-show="state === 'no_session'" x-cloak>
+      <p style="color:#A0A0A0;margin:24px 0">Sessiya topilmadi.</p>
+      <a href="{% url 'tg_start_view' %}" class="btn btn--primary">Qaytadan boshlash</a>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.loader {
+  width:14px;height:14px;border:2px solid #2a2a2a;border-top:2px solid #E8B84B;
+  border-radius:50%;animation:spin .8s linear infinite;display:inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.step-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid #252525;
+}
+.step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #404040;
+  font-weight: 500;
+  justify-content: center;
+}
+.step span {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 11px;
+  color: #606060;
+}
+.step.active { color: #E8B84B; }
+.step.active span { background: rgba(232,184,75,0.15); color: #E8B84B; border: 1px solid rgba(232,184,75,0.3); }
+.step.done { color: #2ECC71; }
+.step.done span { background: rgba(46,204,113,0.15); color: #2ECC71; }
+.step.done span::after { content: '✓'; position: absolute; }
+.step.done span { font-size: 0; }
+.step.done span::after { font-size: 11px; }
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function tgWaiting() {
+  return {
+    state: 'pending',
+    welcomeText: '',
+    phone: '',
+    name: '',
+    pollHandle: null,
+
+    init() {
+      this.poll();
+      this.pollHandle = setInterval(() => this.poll(), 2000);
+    },
+
+    async poll() {
+      try {
+        const res = await fetch('{% url "tg_status" %}', {
+          method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        });
+        const data = await res.json();
+
+        if (data.state === 'verified' && data.redirect) {
+          this.state = 'verified';
+          clearInterval(this.pollHandle);
+          setTimeout(() => window.location.href = data.redirect, 600);
+          return;
+        }
+
+        if (data.state === 'awaiting_contact') {
+          this.state = 'awaiting_contact';
+          const fn = data.first_name || '';
+          this.welcomeText = fn ? `Salom, ${fn}!` : '';
+        } else if (data.state === 'awaiting_name') {
+          this.state = 'awaiting_name';
+          this.phone = data.phone || '';
+        } else if (data.state === 'ready') {
+          this.state = 'ready';
+          this.name = data.name || '';
+        } else if (data.state === 'expired' || data.state === 'no_session') {
+          this.state = data.state;
+          clearInterval(this.pollHandle);
+        }
+      } catch (e) { /* ignore transient errors */ }
+    }
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'app_base.html' %}
+{% block title %}Mening profilim — Bu Nurbek{% endblock %}
+{% block content %}
+<div class="form-page">
+  <div class="form-card">
+    <h1 class="form-card__title">Mening profilim</h1>
+    <p class="form-card__sub">{{ user.email }}</p>
+
+    <div style="margin-bottom:24px">
+      {% if user.is_enrolled %}
+      <div class="message message--success">✓ Kursga kirish faol</div>
+      {% else %}
+      <div class="message message--info" style="position:static;max-width:100%">
+        To'lov tasdiqlanishi kutilmoqda. Savollar uchun:
+        <a href="https://t.me/bu_nurbek" style="color:var(--gold)">@bunurbek</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Ism Familiya</label>
+      <input class="form-input" type="text" value="{{ user.full_name }}" readonly>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" type="email" value="{{ user.email }}" readonly>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Telefon</label>
+      <input class="form-input" type="text" value="{{ user.phone|default:'—' }}" readonly>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:8px">
+      <a href="{% url 'course_home' %}" class="btn btn--primary" style="flex:1;justify-content:center">Kursga o'tish</a>
+      <a href="{% url 'logout' %}" class="btn btn--ghost">Chiqish</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

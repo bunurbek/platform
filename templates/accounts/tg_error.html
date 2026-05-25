@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Xatolik — Bu Nurbek{% endblock %}
+{% block content %}
+<div class="form-page">
+  <div class="form-card" style="text-align:center">
+    <div style="font-size:48px;margin-bottom:16px">❌</div>
+    <h1 class="form-card__title">Xatolik</h1>
+    <p class="form-card__sub" style="margin-bottom:24px">{{ error }}</p>
+    <a href="{% url 'tg_start_view' %}" class="btn btn--primary btn--full">Qaytadan boshlash</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'app_base.html' %}
+{% load static %}
+{% block title %}{{ lesson.title }} — Bepul namuna{% endblock %}
+
+{% block content %}
+<div x-data="{ showModal: false, videoEnded: false }"
+     style="min-height:100vh;background:#0a0a0a;padding:100px 24px 64px">
+
+  <div style="max-width:920px;margin:0 auto">
+
+    <!-- Top banner -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+      <div>
+        <span style="display:inline-block;background:rgba(232,184,75,0.12);color:#E8B84B;border:1px solid rgba(232,184,75,0.3);padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px">
+          🎁 Bepul namuna dars
+        </span>
+        <h1 style="font-family:'Montserrat',sans-serif;font-size:26px;font-weight:800;margin-top:12px;color:#F0F0F0">
+          {{ lesson.title }}
+        </h1>
+      </div>
+      <button @click="showModal = true" class="btn btn--secondary btn--sm">
+        🔓 To'liq kursni ochish
+      </button>
+    </div>
+
+    <!-- Video player -->
+    <div class="video-wrapper" style="margin-bottom:24px">
+      {% if lesson.video_url %}
+        <iframe src="{{ lesson.video_url }}" allowfullscreen></iframe>
+      {% elif lesson.video_file %}
+        <video controls controlsList="nodownload" id="lessonVideo"
+               @ended="videoEnded = true; setTimeout(() => showModal = true, 800)">
+          <source src="{{ lesson.video_file.url }}" type="video/mp4">
+        </video>
+      {% else %}
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#A0A0A0;text-align:center;padding:24px">
+          <div style="font-size:48px;margin-bottom:12px">🎬</div>
+          <p>Video tez orada qo'shiladi</p>
+          <button @click="showModal = true; videoEnded = true" class="btn btn--primary btn--sm" style="margin-top:20px">
+            Davom etish →
+          </button>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Lesson description -->
+    {% if lesson.description %}
+    <p style="color:#A0A0A0;line-height:1.7;margin-bottom:24px">{{ lesson.description }}</p>
+    {% endif %}
+
+    <!-- "What's next" preview -->
+    <div style="background:#1a1a1a;border:1px solid #252525;border-radius:12px;padding:28px;margin-top:32px">
+      <p style="font-size:13px;text-transform:uppercase;letter-spacing:2px;color:#606060;margin-bottom:16px">
+        Kursning qolgan {{ total_lessons|add:"-1" }} moduli sizni kutmoqda
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+        <div style="font-size:14px;color:#A0A0A0">📷 Kamera nastroykalari</div>
+        <div style="font-size:14px;color:#A0A0A0">🎬 Videodagi nastroykalar</div>
+        <div style="font-size:14px;color:#A0A0A0">🎤 Ovoz yozish</div>
+        <div style="font-size:14px;color:#A0A0A0">📐 Kompozitsiya va rakurslar</div>
+        <div style="font-size:14px;color:#A0A0A0">💡 Yorug'lik bilan ishlash</div>
+        <div style="font-size:14px;color:#A0A0A0">✂️ Montaj — Davinci Resolve</div>
+        <div style="font-size:14px;color:#A0A0A0">🎨 Color grading</div>
+        <div style="font-size:14px;color:#A0A0A0">🔊 Sound dizayn</div>
+        <div style="font-size:14px;color:#A0A0A0">💡 Idea va scenariy</div>
+        <div style="font-size:14px;color:#A0A0A0">💰 Monetizatsiya · mijozlar</div>
+      </div>
+      <button @click="showModal = true" class="btn btn--primary btn--full" style="margin-top:24px">
+        🔓 To'liq kursni ochish
+      </button>
+    </div>
+
+  </div>
+
+  <!-- CONVERSION MODAL -->
+  <div x-show="showModal" x-cloak x-transition
+       style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;overflow-y:auto"
+       @click.self="showModal = false">
+    <div @click.stop
+         style="background:#1a1a1a;border:1px solid #333;border-radius:16px;padding:40px;max-width:520px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,0.6)">
+
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:56px;margin-bottom:8px">🎬</div>
+        <h2 style="font-family:'Montserrat',sans-serif;font-size:26px;font-weight:900;color:#F0F0F0;margin-bottom:8px">
+          <span x-show="videoEnded">Birinchi darsni tugatdingiz!</span>
+          <span x-show="!videoEnded">To'liq kursni oching</span>
+        </h2>
+        <p style="color:#A0A0A0;font-size:15px">
+          Sinematik videograf bo'lish uchun butun yo'lni o'rganing
+        </p>
+      </div>
+
+      <ul style="list-style:none;padding:0;margin:0 0 28px 0;display:flex;flex-direction:column;gap:10px">
+        <li style="display:flex;align-items:center;gap:10px;color:#F0F0F0"><span style="color:#2ECC71">✓</span> Yana 13 ta modul — kamera, montaj, color grading va monetizatsiya</li>
+        <li style="display:flex;align-items:center;gap:10px;color:#F0F0F0"><span style="color:#2ECC71">✓</span> Davinci Resolve to'liq workflow</li>
+        <li style="display:flex;align-items:center;gap:10px;color:#F0F0F0"><span style="color:#2ECC71">✓</span> Umrbod kirish huquqi</li>
+        <li style="display:flex;align-items:center;gap:10px;color:#F0F0F0"><span style="color:#2ECC71">✓</span> Nurbek bilan to'g'ridan-to'g'ri aloqa</li>
+        <li style="display:flex;align-items:center;gap:10px;color:#F0F0F0"><span style="color:#2ECC71">✓</span> Mijoz jalb qilish va shaxsiy brend bo'limi</li>
+      </ul>
+
+      <div style="background:rgba(232,184,75,0.08);border:1px solid rgba(232,184,75,0.2);border-radius:12px;padding:20px;text-align:center;margin-bottom:24px">
+        <p style="font-size:13px;text-transform:uppercase;letter-spacing:2px;color:#A0A0A0;margin-bottom:8px">Bir marta to'lov</p>
+        <p style="font-family:'Montserrat',sans-serif;font-size:48px;font-weight:900;color:#E8B84B;line-height:1">$300</p>
+        <p style="font-size:13px;color:#A0A0A0;margin-top:8px">
+          Bu narx bitta to'lovli shooting bilan qoplanadi
+        </p>
+      </div>
+
+      <a href="https://t.me/bu_nurbek" target="_blank" rel="noopener" class="btn btn--primary btn--lg btn--full">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.48 14.62l-2.95-.924c-.64-.203-.654-.64.135-.95l11.57-4.461c.537-.194 1.006.131.327.963z"/></svg>
+        Telegram orqali to'lash
+      </a>
+
+      <p style="text-align:center;font-size:13px;color:#606060;margin-top:16px">
+        🛡️ Natija bo'lmasa, pulni qaytaramiz
+      </p>
+
+      <button @click="showModal = false" style="display:block;margin:20px auto 0;background:none;border:none;color:#606060;font-size:13px;cursor:pointer">
+        Keyinroq
+      </button>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

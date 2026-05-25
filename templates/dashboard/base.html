@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Dashboard{% endblock %} — Bu Nurbek Admin</title>
+  {% load static %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="dash-body">
+
+<div class="dash-layout" x-data="{ sidebar: false }">
+
+  <!-- Backdrop (mobile only) -->
+  <div class="dash-sidebar-backdrop" :class="sidebar ? 'dash-sidebar-backdrop--visible' : ''"
+       @click="sidebar = false"></div>
+
+  <!-- Sidebar -->
+  <aside class="dash-sidebar" :class="sidebar ? 'dash-sidebar--open' : ''" @click="sidebar = false">
+    <div class="dash-sidebar__brand">
+      <a href="{% url 'dashboard_home' %}">Bu <span>Nurbek</span></a>
+      <span class="dash-sidebar__badge">Admin</span>
+    </div>
+
+    <nav class="dash-nav">
+      <a href="{% url 'dashboard_home' %}"   class="dash-nav__item {% block nav_home %}{% endblock %}">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Bosh sahifa
+      </a>
+      <a href="{% url 'dash_students' %}"    class="dash-nav__item {% block nav_students %}{% endblock %}">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Talabalar
+      </a>
+      <a href="{% url 'dash_payments' %}"    class="dash-nav__item {% block nav_payments %}{% endblock %}">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        To'lovlar
+      </a>
+      <a href="{% url 'dash_content' %}"     class="dash-nav__item {% block nav_content %}{% endblock %}">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Darslar
+      </a>
+      <a href="{% url 'dash_analytics' %}"   class="dash-nav__item {% block nav_analytics %}{% endblock %}">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analitika
+      </a>
+    </nav>
+
+    <div class="dash-sidebar__footer">
+      <a href="{% url 'landing' %}" class="dash-nav__item">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Saytni ko'rish
+      </a>
+      <a href="{% url 'logout' %}" class="dash-nav__item dash-nav__item--danger">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Chiqish
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <button class="dash-topbar__burger" @click.stop="sidebar = !sidebar" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="dash-topbar__title">{% block page_title %}Dashboard{% endblock %}</div>
+      <div class="dash-topbar__user">
+        <span>{{ user.display_name }}</span>
+        <div class="dash-avatar">{{ user.display_name|first|upper }}</div>
+      </div>
+    </div>
+
+    {% if messages %}
+    <div style="padding: 0 32px;">
+      {% for message in messages %}
+      <div class="message message--{{ message.tags }}" style="position:static;max-width:100%;margin-bottom:8px">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="dash-content">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

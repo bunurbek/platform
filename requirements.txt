@@ -1,0 +1,22 @@
+# Core
+Django>=5.2,<6.1
+gunicorn>=23.0.0
+whitenoise>=6.7.0
+python-dotenv>=1.0.1
+
+# Database
+psycopg[binary]>=3.2.0
+dj-database-url>=2.2.0
+
+# Auth
+django-allauth>=65.0.0
+
+# Storage (Cloudflare R2 / S3-compatible)
+django-storages>=1.14.4
+boto3>=1.35.0
+
+# Telegram bot — raw HTTP polling
+requests>=2.32.0
+
+# Images
+Pillow>=10.4.0

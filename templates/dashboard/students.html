@@ -1,0 +1,162 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Talabalar{% endblock %}
+{% block page_title %}Talabalar{% endblock %}
+{% block nav_students %}dash-nav__item--active{% endblock %}
+
+{% block content %}
+
+<div class="dash-table-wrap" x-data="enrollModal()">
+
+  <div class="dash-table-header">
+    <span class="dash-table-header__title">Barcha talabalar ({{ total_count }})</span>
+    <form class="dash-search" method="get">
+      <input type="text" name="q" value="{{ q }}" placeholder="Ism, email, telefon...">
+      <select name="status" onchange="this.form.submit()">
+        <option value="" {% if not status %}selected{% endif %}>Barchasi</option>
+        <option value="enrolled" {% if status == 'enrolled' %}selected{% endif %}>Faol</option>
+        <option value="pending" {% if status == 'pending' %}selected{% endif %}>Kutayapti</option>
+      </select>
+      <button type="submit" class="dash-btn dash-btn--gold">Qidirish</button>
+    </form>
+  </div>
+
+  <div class="dash-table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th>Talaba</th>
+        <th>Telefon</th>
+        <th>Holat</th>
+        <th>Ro'yxat sanasi</th>
+        <th>Progress</th>
+        <th>Amallar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in users_data %}
+      <tr>
+        <td>
+          <a href="{% url 'dash_student_detail' item.user.pk %}" style="color:#F0F0F0;font-weight:600">
+            {{ item.user.display_name }}
+          </a>
+          <div style="font-size:12px;color:#606060">{{ item.user.email }}</div>
+        </td>
+        <td style="font-size:13px;color:#808080">{{ item.user.phone|default:"—" }}</td>
+        <td>
+          {% if item.user.is_enrolled %}
+          <span class="badge badge--green">✓ Faol</span>
+          {% else %}
+          <span class="badge badge--yellow">Kutayapti</span>
+          {% endif %}
+        </td>
+        <td style="font-size:13px;color:#606060">{{ item.user.created_at|date:"d M Y" }}</td>
+        <td>
+          {% if item.user.is_enrolled and item.total %}
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="mini-progress">
+              <div class="mini-progress__fill" style="width:{% widthratio item.completed item.total 100 %}%"></div>
+            </div>
+            <span style="font-size:12px;color:#808080">{{ item.completed }}/{{ item.total }}</span>
+          </div>
+          {% else %}
+          <span style="color:#404040;font-size:12px">—</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="dash-actions">
+            <a href="{% url 'dash_student_detail' item.user.pk %}" class="dash-btn dash-btn--gray">Ko'rish</a>
+            {% if item.user.is_enrolled %}
+            <button class="dash-btn dash-btn--red" @click="revoke('{{ item.user.pk }}', '{{ item.user.display_name }}')">
+              Bekor
+            </button>
+            {% else %}
+            <button class="dash-btn dash-btn--green" @click="open('{{ item.user.pk }}', '{{ item.user.display_name }}', '{{ item.user.email }}')">
+              Qabul
+            </button>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6">
+          <div class="empty-state">
+            <div class="empty-state__icon">👥</div>
+            <p class="empty-state__text">Hech qanday talaba topilmadi</p>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+  <!-- Enroll Modal -->
+  <div class="modal-overlay" x-show="showModal" x-cloak @click.self="showModal=false">
+    <div class="modal" @click.stop>
+      <p class="modal__title">Kursga qabul qilish</p>
+      <p class="modal__sub" x-text="'Talaba: ' + studentName"></p>
+
+      <div class="modal__field">
+        <label class="modal__label">To'lov miqdori ($)</label>
+        <input class="modal__input" type="number" x-model="amount" placeholder="300">
+      </div>
+      <div class="modal__field">
+        <label class="modal__label">Telegram username yoki o'tkazma ID</label>
+        <input class="modal__input" type="text" x-model="reference" placeholder="@username yoki TRX-12345">
+      </div>
+      <div class="modal__field">
+        <label class="modal__label">To'lov sanasi</label>
+        <input class="modal__input" type="date" x-model="payDate">
+      </div>
+      <div class="modal__field">
+        <label class="modal__label">Izoh (ixtiyoriy)</label>
+        <input class="modal__input" type="text" x-model="notes" placeholder="Qo'shimcha ma'lumot">
+      </div>
+
+      <div class="modal__actions">
+        <button class="btn btn--primary" style="flex:1" @click="confirmEnroll()">✓ Tasdiqlash</button>
+        <button class="btn btn--ghost" @click="showModal=false">Bekor</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function enrollModal() {
+  return {
+    showModal: false,
+    studentId: '',
+    studentName: '',
+    amount: 300,
+    reference: '',
+    payDate: new Date().toISOString().split('T')[0],
+    notes: '',
+    open(id, name, email) {
+      this.studentId = id;
+      this.studentName = name + ' (' + email + ')';
+      this.showModal = true;
+    },
+    revoke(id, name) {
+      if (!confirm(name + ' — kurs kirishini bekor qilmoqchimisiz?')) return;
+      fetch(`/dashboard/students/${id}/revoke/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'}
+      }).then(r => r.json()).then(d => { if(d.ok) location.reload(); });
+    },
+    confirmEnroll() {
+      if (!this.reference) { alert("To'lov ma'lumotini kiriting"); return; }
+      fetch(`/dashboard/students/${this.studentId}/enroll/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'},
+        body: JSON.stringify({amount: this.amount, reference: this.reference, date: this.payDate, notes: this.notes})
+      }).then(r => r.json()).then(d => { if(d.ok) { this.showModal=false; location.reload(); } });
+    }
+  }
+}
+</script>
+{% endblock %}

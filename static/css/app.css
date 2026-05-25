@@ -1,0 +1,202 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   APP MODE — for logged-in students
+   Slim navbar, focused on the course experience
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.app-body { background: var(--bg); }
+
+/* ── App Nav ─────────────────────────────────────────────────────────── */
+.app-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(10,10,11,0.78);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+}
+.app-nav__inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 12px var(--gutter-mobile);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+@media (min-width: 768px) { .app-nav__inner { padding: 14px var(--gutter); } }
+
+.app-nav__brand {
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+.app-nav__brand span { color: var(--gold); }
+
+.app-nav__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-nav__link {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all .15s;
+}
+@media (min-width: 600px) { .app-nav__link { display: inline-flex; } }
+.app-nav__link:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.app-nav__link--active { color: var(--gold); background: rgba(232,184,75,0.08); }
+
+/* ── Profile dropdown ────────────────────────────────────────────────── */
+.app-profile { position: relative; }
+.app-profile__btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  background: linear-gradient(135deg, rgba(232,184,75,0.18), rgba(232,184,75,0.04));
+  border: 1.5px solid rgba(232,184,75,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: border-color .15s, transform .15s;
+}
+.app-profile__btn:hover { border-color: var(--gold); transform: scale(1.05); }
+.app-profile__btn img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.app-profile__initial {
+  color: var(--gold);
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.app-profile__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 240px;
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+  z-index: 110;
+}
+.app-profile__head {
+  padding: 10px 12px 12px;
+}
+.app-profile__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.app-profile__sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.app-profile__divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+.app-profile__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  font-size: 14px;
+  color: var(--text);
+  border-radius: 8px;
+  transition: background .15s;
+}
+.app-profile__item:hover { background: rgba(255,255,255,0.04); }
+.app-profile__item--danger { color: var(--danger); }
+.app-profile__item--danger:hover { background: rgba(231,76,60,0.08); }
+
+/* ── Continue Lesson Hero (top of course home) ──────────────────────── */
+.continue-card {
+  background:
+    radial-gradient(ellipse at top right, rgba(232,184,75,0.12), transparent 60%),
+    linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid rgba(232,184,75,0.25);
+  border-radius: var(--radius-lg);
+  padding: 24px 22px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+@media (min-width: 600px) { .continue-card { padding: 32px 36px; } }
+
+.continue-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.continue-card__head-dot {
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--gold);
+  animation: dotPulse 2s ease-in-out infinite;
+}
+.continue-card__title {
+  font-family: var(--font-head);
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 800;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.continue-card__sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.continue-card__sub strong { color: var(--text); }
+
+.continue-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.continue-card__meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+.continue-card__meta-dot { width: 4px; height: 4px; background: var(--text-dim); border-radius: 50%; }
+@media (max-width: 600px) { .continue-card__meta { margin-left: 0; width: 100%; margin-top: 6px; } }
+
+/* Welcome-back state (no incomplete lesson — show overall progress) */
+.continue-card--complete {
+  background:
+    radial-gradient(ellipse at top right, rgba(46,204,113,0.12), transparent 60%),
+    linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-color: rgba(46,204,113,0.25);
+}
+.continue-card--complete .continue-card__head { color: var(--success); }
+.continue-card--complete .continue-card__head-dot { background: var(--success); box-shadow: 0 0 12px var(--success); }
