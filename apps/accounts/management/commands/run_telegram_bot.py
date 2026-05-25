@@ -76,9 +76,9 @@ class Command(BaseCommand):
             try:
                 resp = requests.get(
                     f"{self.base}/getUpdates",
-                    params={'offset': offset, 'timeout': 25,
+                    params={'offset': offset, 'timeout': 10,
                             'allowed_updates': '["message"]'},
-                    timeout=30,
+                    timeout=15,
                 )
                 data = resp.json()
                 if not data.get('ok'):

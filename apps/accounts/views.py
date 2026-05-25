@@ -14,8 +14,8 @@ from .models import CustomUser, TelegramAuthSession
 # ── TELEGRAM AUTH ──────────────────────────────────────────────────────────────
 
 def tg_start(request):
-    """User clicks 'Bepul boshlash' — generate a session token, show the Telegram redirect page.
-    Re-uses existing pending session if user is already mid-flow."""
+    """Unified Telegram auth page — handles all states (pending → contact → name → code → verified).
+    Reuses existing pending session if user is already mid-flow."""
     token = request.session.get('tg_auth_token')
     reuse = False
     if token:
@@ -31,24 +31,16 @@ def tg_start(request):
         request.session['tg_auth_token'] = token
 
     bot_username = settings.TELEGRAM_BOT_USERNAME or 'bunurbekauth_bot'
-    return render(request, 'accounts/tg_start.html', {
+    return render(request, 'accounts/tg_auth.html', {
         'bot_username': bot_username,
         'tg_link': f"https://t.me/{bot_username}?start={token}",
         'token': token,
     })
 
 
+# Backwards-compat: /start/waiting/ → same unified page
 def tg_waiting(request):
-    """Waiting room — page polls until the bot collected everything and user clicked auth link."""
-    token = request.session.get('tg_auth_token')
-    if not token:
-        return redirect('tg_start_view')
-    bot_username = settings.TELEGRAM_BOT_USERNAME or 'bunurbekauth_bot'
-    return render(request, 'accounts/tg_waiting.html', {
-        'token': token,
-        'bot_username': bot_username,
-        'tg_link': f"https://t.me/{bot_username}?start={token}",
-    })
+    return tg_start(request)
 
 
 @require_POST
