@@ -48,14 +48,24 @@
       </p>
 
       <div class="code-inputs" @paste="handlePaste">
-        <template x-for="i in 6" :key="i">
-          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1"
-                 class="code-input"
-                 x-model="digits[i-1]"
-                 :ref="'d' + (i-1)"
-                 @input="onInput($event, i-1)"
-                 @keydown.backspace="onBackspace($event, i-1)">
-        </template>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code"
+               class="code-input" data-i="0" x-model="digits[0]"
+               @input="onInput($event, 0)" @keydown.backspace="onBackspace($event, 0)">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code"
+               class="code-input" data-i="1" x-model="digits[1]"
+               @input="onInput($event, 1)" @keydown.backspace="onBackspace($event, 1)">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code"
+               class="code-input" data-i="2" x-model="digits[2]"
+               @input="onInput($event, 2)" @keydown.backspace="onBackspace($event, 2)">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code"
+               class="code-input" data-i="3" x-model="digits[3]"
+               @input="onInput($event, 3)" @keydown.backspace="onBackspace($event, 3)">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code"
+               class="code-input" data-i="4" x-model="digits[4]"
+               @input="onInput($event, 4)" @keydown.backspace="onBackspace($event, 4)">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code"
+               class="code-input" data-i="5" x-model="digits[5]"
+               @input="onInput($event, 5)" @keydown.backspace="onBackspace($event, 5)">
       </div>
 
       <p x-show="error" x-text="error" style="color:#e74c3c;font-size:14px;margin-top:14px;text-align:center"></p>
@@ -230,6 +240,13 @@ function tgAuth() {
       this.pollHandle = setInterval(() => this.poll(), 2000);
     },
 
+    // Direct DOM helpers — works reliably (no Alpine $refs limitations)
+    inputs() { return document.querySelectorAll('.code-input'); },
+    focusAt(i) {
+      const el = this.inputs()[i];
+      if (el) { el.focus(); el.select?.(); }
+    },
+
     async poll() {
       // Stop once we hand off control (avoid race with manual digits)
       if (this.state === 'ready' || this.state === 'verified') return;
@@ -248,7 +265,8 @@ function tgAuth() {
           this.state = 'ready';
           this.name = data.name || '';
           clearInterval(this.pollHandle);
-          this.$nextTick(() => this.$refs.d0?.focus());
+          // Wait for inputs to render, then focus the first one
+          setTimeout(() => this.focusAt(0), 50);
         } else if (data.state === 'verified' && data.redirect) {
           this.state = 'verified';
           clearInterval(this.pollHandle);
@@ -261,19 +279,34 @@ function tgAuth() {
     },
 
     onInput(e, idx) {
-      const val = e.target.value.replace(/\D/g,'').slice(0,1);
+      const val = (e.target.value || '').replace(/\D/g,'').slice(0,1);
       this.digits[idx] = val;
-      if (val && idx < 5) this.$refs['d' + (idx+1)]?.focus();
+      e.target.value = val;   // keep the visible char in sync
+      if (val && idx < 5) this.focusAt(idx + 1);
       if (this.code.length === 6) this.verify();
     },
     onBackspace(e, idx) {
-      if (!this.digits[idx] && idx > 0) this.$refs['d' + (idx-1)]?.focus();
+      if (!e.target.value && idx > 0) {
+        // Empty box + backspace → jump back AND clear previous
+        this.digits[idx - 1] = '';
+        this.focusAt(idx - 1);
+      }
     },
     handlePaste(e) {
       e.preventDefault();
       const text = (e.clipboardData?.getData('text') || '').replace(/\D/g,'').slice(0,6);
-      for (let i=0; i<6; i++) this.digits[i] = text[i] || '';
-      if (this.code.length === 6) this.$nextTick(() => this.verify());
+      for (let i = 0; i < 6; i++) {
+        this.digits[i] = text[i] || '';
+        const el = this.inputs()[i];
+        if (el) el.value = text[i] || '';
+      }
+      // Focus the next empty box (or submit if full)
+      if (this.code.length === 6) {
+        this.focusAt(5);
+        setTimeout(() => this.verify(), 100);
+      } else {
+        this.focusAt(text.length);
+      }
     },
     async verify() {
       if (this.loading || this.code.length !== 6) return;
@@ -294,7 +327,9 @@ function tgAuth() {
         } else {
           this.error = data.error || 'Xatolik';
           this.digits = ['','','','','',''];
-          this.$nextTick(() => this.$refs.d0?.focus());
+          // Also clear the actual input values
+          this.inputs().forEach(el => el.value = '');
+          setTimeout(() => this.focusAt(0), 30);
         }
       } catch (e) {
         this.error = 'Server xatosi';
