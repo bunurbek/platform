@@ -583,31 +583,129 @@
 }
 .lesson-strip__check { color: var(--success); font-weight: 700; }
 
-/* ── Prev / Next nav at bottom ── */
-.lesson-nav-min {
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODULE THUMBNAILS — image or stylish gradient fallback
+   ═══════════════════════════════════════════════════════════════════════════ */
+.module-thumb {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+@media (min-width: 600px) { .module-thumb { width: 64px; height: 64px; border-radius: 14px; } }
+
+.module-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.module-thumb__num {
+  font-family: var(--font-head);
+  font-size: 20px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.92);
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  z-index: 1;
+}
+.module-thumb__badge {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 20px; height: 20px;
+  background: var(--bg);
+  border: 1.5px solid var(--bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--success);
+  z-index: 2;
+}
+.module-thumb--locked .module-thumb__badge { color: var(--text-muted); }
+.module-thumb--locked { opacity: 0.6; }
+.module-thumb--complete { border-color: rgba(46,204,113,0.4); }
+
+/* 14 unique cinematic gradients — one per module */
+.module-thumb--m1  { background: linear-gradient(135deg, #2c3e50, #4a6fa5); }
+.module-thumb--m2  { background: linear-gradient(135deg, #654ea3, #eaafc8); }
+.module-thumb--m3  { background: linear-gradient(135deg, #134e5e, #71b280); }
+.module-thumb--m4  { background: linear-gradient(135deg, #b06ab3, #4568dc); }
+.module-thumb--m5  { background: linear-gradient(135deg, #e96443, #904e95); }
+.module-thumb--m6  { background: linear-gradient(135deg, #1a2a6c, #b21f1f); }
+.module-thumb--m7  { background: linear-gradient(135deg, #0f2027, #2c5364); }
+.module-thumb--m8  { background: linear-gradient(135deg, #e8b84b, #c99a30); }
+.module-thumb--m9  { background: linear-gradient(135deg, #232526, #414345); }
+.module-thumb--m10 { background: linear-gradient(135deg, #ff512f, #dd2476); }
+.module-thumb--m11 { background: linear-gradient(135deg, #00c6ff, #0072ff); }
+.module-thumb--m12 { background: linear-gradient(135deg, #fc4a1a, #f7b733); }
+.module-thumb--m13 { background: linear-gradient(135deg, #355c7d, #c06c84); }
+.module-thumb--m14 { background: linear-gradient(135deg, #43cea2, #185a9d); }
+
+/* Show thumbnail in place of (or with) the progress ring */
+.module-card__head { gap: 14px !important; }
+@media (min-width: 600px) { .module-card__head { gap: 18px !important; } }
+
+/* Lesson row check icon */
+.lesson-row__check { color: var(--success); font-weight: 700; }
+
+/* ── Sticky prev/next bar — always visible at bottom ── */
+.lesson-page-min { padding-bottom: 100px !important; }   /* room for sticky bar */
+@media (max-width: 600px) { .lesson-page-min { padding-bottom: 90px !important; } }
+
+.lesson-stickynav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 80;
+  background: rgba(10,10,11,0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-top: 1px solid var(--border);
+  padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+}
+.lesson-stickynav__inner {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 var(--gutter-mobile);
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 28px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
 }
-.lesson-nav-min__btn {
+@media (min-width: 768px) { .lesson-stickynav__inner { padding: 0 var(--gutter); } }
+
+.lesson-stickynav__btn {
+  flex: 1;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 18px;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 14px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text);
   font-size: 14px;
   font-weight: 600;
+  text-decoration: none;
   transition: all var(--transition);
+  min-height: 44px;
 }
-.lesson-nav-min__btn:hover { border-color: var(--gold); color: var(--gold); }
-.lesson-nav-min__btn--next { background: var(--gold); color: #000; border-color: var(--gold); }
-.lesson-nav-min__btn--next:hover { background: var(--gold-dark); color: #000; border-color: var(--gold-dark); }
+.lesson-stickynav__btn:hover { border-color: var(--gold); color: var(--gold); }
+.lesson-stickynav__btn--primary {
+  background: var(--gold);
+  color: #000;
+  border-color: var(--gold);
+}
+.lesson-stickynav__btn--primary:hover { background: var(--gold-dark); color: #000; }
+.lesson-stickynav__btn svg { flex-shrink: 0; }
 
 /* ── Conversion modal — clean, mobile-first ── */
 .conv-overlay {

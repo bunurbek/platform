@@ -24,6 +24,8 @@ class Module(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    thumbnail = models.ImageField(upload_to='modules/', blank=True, null=True,
+                                  help_text='Modul uchun rasm (kvadrat, JPG/PNG)')
     order = models.PositiveIntegerField(default=0)
     is_free = models.BooleanField(default=False, help_text='Bepul namuna modul (ro\'yxatdan o\'tgan har kim ko\'ra oladi)')
     created_at = models.DateTimeField(auto_now_add=True)

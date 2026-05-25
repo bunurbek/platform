@@ -22,9 +22,6 @@
 
     <!-- ── Lesson title ─────────────────────────────────────────── -->
     <h1 class="lesson-title-min">{{ lesson.title }}</h1>
-    {% if lesson.duration_minutes %}
-    <p class="lesson-duration-min">⏱ {{ lesson.duration_minutes }} daqiqa</p>
-    {% endif %}
 
     <!-- ── Video player ────────────────────────────────────────── -->
     <div class="video-wrapper">
@@ -89,47 +86,35 @@
     </div>
     {% endif %}
 
-    <!-- ── Sub-lesson strip (numbered cards) ─────────────────────────── -->
-    {% if module_lessons|length > 1 %}
-    <div class="lesson-strip">
-      {% for l in module_lessons %}
-      <a href="{% url 'lesson' l.pk %}"
-         class="lesson-strip__item
-                {% if l.pk == lesson.pk %}lesson-strip__item--current{% endif %}
-                {% if l.pk in completed_in_module %}lesson-strip__item--done{% endif %}">
-        <span class="lesson-strip__num">{{ l.order|stringformat:"02d" }}</span>
-        <span class="lesson-strip__title">{{ l.title|truncatechars:24 }}</span>
-        <span class="lesson-strip__bottom">
-          {% if l.pk in completed_in_module %}<span class="lesson-strip__check">✓</span>{% endif %}
-          {% if l.duration_minutes %}<span>{{ l.duration_minutes }}m</span>{% endif %}
-        </span>
-      </a>
-      {% endfor %}
-    </div>
-    {% endif %}
+  </div>
 
-    <!-- ── Prev / Next nav ───────────────────────────────────────────── -->
-    <div class="lesson-nav-min">
+  <!-- ── Sticky prev/next bar ─────────────────────────────────────── -->
+  <nav class="lesson-stickynav">
+    <div class="lesson-stickynav__inner">
       {% if prev_lesson %}
-        <a href="{% url 'lesson' prev_lesson.pk %}" class="lesson-nav-min__btn lesson-nav-min__btn--prev">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        <a href="{% url 'lesson' prev_lesson.pk %}" class="lesson-stickynav__btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           <span>Oldingi</span>
         </a>
-      {% else %}<span></span>{% endif %}
+      {% else %}
+        <a href="{% url 'course_home' %}" class="lesson-stickynav__btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          <span>Modullar</span>
+        </a>
+      {% endif %}
       {% if next_lesson %}
-        <a href="{% url 'lesson' next_lesson.pk %}" class="lesson-nav-min__btn lesson-nav-min__btn--next">
+        <a href="{% url 'lesson' next_lesson.pk %}" class="lesson-stickynav__btn lesson-stickynav__btn--primary">
           <span>Keyingi</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
       {% elif next_module %}
-        <a href="{% url 'course_home' %}" class="lesson-nav-min__btn lesson-nav-min__btn--next">
-          <span>Modullarga qaytish</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        <a href="{% url 'course_home' %}" class="lesson-stickynav__btn lesson-stickynav__btn--primary">
+          <span>Modullarga</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
       {% else %}<span></span>{% endif %}
     </div>
-
-  </div>
+  </nav>
 
   <!-- ── Conversion modal (only triggered after video ends for unenrolled in free module) ─── -->
   {% if show_conversion_on_end %}

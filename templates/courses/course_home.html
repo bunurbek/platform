@@ -14,7 +14,7 @@
     <!-- ── Header ── -->
     <div class="course-header">
       <h1>{{ course.title }}</h1>
-      <p>{{ course.modules.count }} modul · {{ overall_total }} video · {{ overall_pct }}% tugatildi</p>
+      <p>{{ course.modules.count }} modul · {{ overall_pct }}% tugatildi</p>
     </div>
 
     <!-- ── Continue / cooldown / complete card (one-liner version) ── -->
@@ -59,27 +59,25 @@
 
         <div class="module-card__head" @click="open = open === {{ mod.pk }} ? null : {{ mod.pk }}">
 
-          <!-- Progress ring -->
-          <div class="ring ring--md
-                      {% if m.is_complete %}ring--complete
-                      {% elif m.lock_reason == 'cooldown' %}ring--cooldown
-                      {% elif not m.is_accessible %}ring--locked{% endif %}">
-            <svg viewBox="0 0 36 36">
-              <circle class="ring__bg" cx="18" cy="18" r="15.9" stroke-width="3"></circle>
-              <circle class="ring__fill" cx="18" cy="18" r="15.9" stroke-width="3"
-                      stroke-dasharray="100"
-                      stroke-dashoffset="{% widthratio m.percent|add:'-100' 1 -1 %}"></circle>
-            </svg>
-            <span class="ring__text">{% if m.is_accessible %}{{ m.percent }}%{% endif %}</span>
+          <!-- Module thumbnail (or stylish fallback) -->
+          <div class="module-thumb module-thumb--m{{ mod.order }}
+                      {% if not m.is_accessible %}module-thumb--locked{% endif %}
+                      {% if m.is_complete %}module-thumb--complete{% endif %}">
+            {% if mod.thumbnail %}
+              <img src="{{ mod.thumbnail.url }}" alt="" loading="lazy">
+            {% else %}
+              <span class="module-thumb__num">{{ mod.order|stringformat:"02d" }}</span>
+            {% endif %}
+            {% if m.is_complete %}<span class="module-thumb__badge">✓</span>{% endif %}
+            {% if not m.is_accessible and not m.is_complete %}<span class="module-thumb__badge">🔒</span>{% endif %}
           </div>
 
           <!-- Title block -->
           <div>
-            <div class="module-card__num">MODUL {{ mod.order|stringformat:"02d" }}</div>
+            <div class="module-card__num">MODUL {{ mod.order|stringformat:"02d" }}{% if m.is_accessible and not m.is_complete and m.percent > 0 %} · {{ m.percent }}%{% endif %}</div>
             <div class="module-card__title">{{ mod.title }}</div>
             <div class="module-card__meta">
               <span>{{ m.total }} video</span>
-              {% if mod.total_duration %}<span>·</span><span>{{ mod.total_duration }} daq</span>{% endif %}
               {% if m.lock_reason == 'cooldown' and m.cooldown_seconds %}
                 <span>·</span>
                 <span data-cooldown-mini="{{ m.cooldown_seconds }}" class="cooldown-mini-text">
@@ -104,7 +102,9 @@
                  class="lesson-row{% if l.pk in m.completed_lesson_ids %} lesson-row--complete{% endif %}">
                 <span class="lesson-row__icon"><span class="lesson-row__num">{{ l.order }}</span></span>
                 <span class="lesson-row__title">{{ l.title }}</span>
-                <span class="lesson-row__duration">{{ l.duration_minutes }} daq</span>
+                {% if l.pk in m.completed_lesson_ids %}
+                <span class="lesson-row__check">✓</span>
+                {% endif %}
               </a>
               {% endfor %}
             {% else %}

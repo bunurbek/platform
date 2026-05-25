@@ -29,7 +29,6 @@
           <p style="font-size:15px;font-weight:600;color:#F0F0F0">{{ m.title }}</p>
           <p style="font-size:12px;color:#606060;margin-top:2px">
             {{ m.lessons.count }} video
-            {% if m.total_duration %} · {{ m.total_duration }} daq{% endif %}
           </p>
         </div>
         <button class="badge {% if m.is_free %}badge--green{% else %}badge--gray{% endif %}"
@@ -53,7 +52,6 @@
           <div style="flex:1;min-width:0">
             <p style="font-size:14px;color:#F0F0F0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ l.title }}</p>
             <p style="font-size:12px;color:#606060;margin-top:2px">
-              {% if l.duration_minutes %}⏱ {{ l.duration_minutes }} daq{% endif %}
               {% if l.video_url %} · 🔗 URL{% endif %}
               {% if l.video_file %} · 📁 Video{% endif %}
               {% if not l.video_url and not l.video_file %} · ⚠ Video yo'q{% endif %}
@@ -139,16 +137,10 @@
                   style="resize:vertical;font-family:inherit"
                   placeholder="Bu darsda nimani o'rganasiz, qaysi texnikalar yoritiladi..."></textarea>
       </div>
-      <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px">
-        <div class="modal__field">
-          <label class="modal__label">Video URL</label>
-          <input class="modal__input" type="url" x-model="editLesson.video_url"
-                 placeholder="https://www.youtube.com/embed/...">
-        </div>
-        <div class="modal__field">
-          <label class="modal__label">Daqiqa</label>
-          <input class="modal__input" type="number" x-model="editLesson.duration_minutes">
-        </div>
+      <div class="modal__field">
+        <label class="modal__label">Video URL</label>
+        <input class="modal__input" type="url" x-model="editLesson.video_url"
+               placeholder="https://www.youtube.com/embed/...">
       </div>
 
       <div style="border-top:1px solid #252525;margin:18px 0 14px;padding-top:18px">
@@ -209,10 +201,6 @@
       <div class="modal__field">
         <label class="modal__label">Video URL (YouTube embed yoki direct mp4)</label>
         <input class="modal__input" type="url" x-model="newLesson.video_url" placeholder="https://www.youtube.com/embed/...">
-      </div>
-      <div class="modal__field">
-        <label class="modal__label">Davomiyligi (daqiqa)</label>
-        <input class="modal__input" type="number" x-model="newLesson.duration_minutes" placeholder="10">
       </div>
 
       <div class="modal__actions">
