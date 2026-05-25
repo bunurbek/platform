@@ -11,93 +11,43 @@
 <div class="course-page" style="padding-top:70px">
   <div class="container">
 
+    <!-- ── Header ── -->
+    <div class="course-header">
+      <h1>{{ course.title }}</h1>
+      <p>{{ course.modules.count }} modul · {{ overall_total }} video · {{ overall_pct }}% tugatildi</p>
+    </div>
+
+    <!-- ── Continue / cooldown / complete card (one-liner version) ── -->
     {% if continue_lesson %}
-    <!-- Continue learning card — for users with a next lesson to watch -->
     <div class="continue-card fade-in">
-      <div class="continue-card__head">
-        <span class="continue-card__head-dot"></span>
-        <span>{% if continue_is_first %}Boshlash uchun{% else %}Davom eting{% endif %}</span>
+      <div class="continue-card__main">
+        <p class="continue-card__label">{% if continue_is_first %}Birinchi dars{% else %}Davom etish{% endif %}</p>
+        <p class="continue-card__title-min">{{ continue_module.title }} — {{ continue_lesson.title }}</p>
       </div>
-      <h2 class="continue-card__title">
-        {{ continue_module.title }} — <span class="text-gold">{{ continue_lesson.title }}</span>
-      </h2>
-      <p class="continue-card__sub">
-        Modul {{ continue_module.order }} · Dars {{ continue_lesson.order }} —
-        <strong>{{ overall_completed }}/{{ overall_total }}</strong> video tugatildi
-      </p>
-      <div class="continue-card__actions">
-        <a href="{% url 'lesson' continue_lesson.pk %}" class="btn btn--primary btn--lg btn--pulse">
-          ▶ {% if continue_is_first %}Boshlash{% else %}Davom etish{% endif %}
-        </a>
-        <div class="continue-card__meta">
-          {% if continue_lesson.duration_minutes %}<span>⏱ {{ continue_lesson.duration_minutes }} daq</span><span class="continue-card__meta-dot"></span>{% endif %}
-          <span>{{ overall_pct }}% tugatildi</span>
-        </div>
-      </div>
+      <a href="{% url 'lesson' continue_lesson.pk %}" class="btn btn--primary btn--sm">
+        ▶ {% if continue_is_first %}Boshlash{% else %}Davom etish{% endif %}
+      </a>
     </div>
     {% elif waiting_for_cooldown %}
-    <!-- Waiting for next module's cooldown -->
-    <div class="continue-card fade-in" style="border-color:rgba(93,173,226,0.25);background:radial-gradient(ellipse at top right, rgba(93,173,226,0.12), transparent 60%), linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)">
-      <div class="continue-card__head" style="color:#5dade2">
-        <span class="continue-card__head-dot" style="background:#5dade2;box-shadow:0 0 12px #5dade2"></span>
-        <span>Zo'r ish</span>
+    <div class="continue-card continue-card--cooldown fade-in">
+      <div class="continue-card__main">
+        <p class="continue-card__label">Keyingi modul</p>
+        <p class="continue-card__title-min">{{ waiting_for_cooldown.module.title }} — ochilishigacha</p>
       </div>
-      <h2 class="continue-card__title">Joriy modulni tugatdingiz 🎉</h2>
-      <p class="continue-card__sub">
-        Keyingi modul — <strong>{{ waiting_for_cooldown.module.title }}</strong> — quyidagi vaqtda ochiladi:
-      </p>
-      <div class="cooldown-block" data-cooldown="{{ waiting_for_cooldown.cooldown_seconds }}" style="display:flex;margin:0;min-width:200px">
-        <span class="cooldown-block__label">Ochilishigacha</span>
-        <span class="cooldown-block__time">--:--:--</span>
-        <span class="cooldown-block__sub">Soat : Daqiqa : Soniya</span>
-      </div>
+      <span class="cooldown-pill" data-cooldown="{{ waiting_for_cooldown.cooldown_seconds }}">
+        <span class="cooldown-pill__time">--:--:--</span>
+      </span>
     </div>
     {% elif overall_pct >= 100 and overall_total > 0 %}
-    <!-- Fully complete -->
     <div class="continue-card continue-card--complete fade-in">
-      <div class="continue-card__head">
-        <span class="continue-card__head-dot"></span>
-        <span>Tabriklayman!</span>
+      <div class="continue-card__main">
+        <p class="continue-card__label">Tabriklayman</p>
+        <p class="continue-card__title-min">Butun kursni tugatdingiz 🎉</p>
       </div>
-      <h2 class="continue-card__title">Butun kursni tugatdingiz 🎉</h2>
-      <p class="continue-card__sub">
-        Endi siz professional videograf bo'lish yo'lidasiz. Amaliyot qiling va eng yaxshi natijalarga erishing.
-      </p>
     </div>
     {% endif %}
 
-    <div class="course-header">
-      <h1>{{ course.title }}</h1>
-      <p>{{ course.modules.count }} modul · {{ overall_total }} video</p>
-    </div>
-
-    <!-- Overall progress strip -->
-    <div class="course-progress fade-in">
-      <div class="ring ring--lg {% if overall_pct >= 100 %}ring--complete{% endif %}" data-ring="{{ overall_pct }}">
-        <svg viewBox="0 0 36 36">
-          <circle class="ring__bg" cx="18" cy="18" r="15.9" stroke-width="3"></circle>
-          <circle class="ring__fill" cx="18" cy="18" r="15.9" stroke-width="3"
-                  stroke-dasharray="100" stroke-dashoffset="{{ overall_pct|add:'-100'|cut:'-' }}"></circle>
-        </svg>
-        <span class="ring__text">{{ overall_pct }}%</span>
-      </div>
-      <div class="course-progress__info">
-        <span class="course-progress__info-label">Jami jarayon</span>
-        <span class="course-progress__info-value">{{ overall_completed }} / {{ overall_total }} video tugatildi</span>
-        <span class="course-progress__info-sub">Davom eting — har bir modul yangi imkoniyat ochadi</span>
-      </div>
-      <div class="course-progress__action">
-        {% if user.is_enrolled %}
-          <span class="module-card__badge module-card__badge--free" style="background:rgba(46,204,113,0.15);color:#2ECC71;border:1px solid rgba(46,204,113,0.3)">✓ Faol</span>
-        {% else %}
-          <a href="https://t.me/bu_nurbek" target="_blank" rel="noopener" class="btn btn--primary btn--sm">
-            To'liq kursni ochish
-          </a>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Module list -->
+    <!-- ── Module list ── -->
     <div class="modules-list" x-data="{ open: {{ modules_data.0.module.pk }} }">
 
       {% for m in modules_data %}
@@ -126,46 +76,20 @@
           <!-- Title block -->
           <div>
             <div class="module-card__num">MODUL {{ mod.order|stringformat:"02d" }}</div>
-            <div class="module-card__title">
-              {{ mod.title }}
-              {% if mod.is_free %}<span class="module-card__badge module-card__badge--free">🎁 Bepul</span>{% endif %}
-            </div>
+            <div class="module-card__title">{{ mod.title }}</div>
             <div class="module-card__meta">
-              <span>🎬 {{ m.total }} video</span>
-              {% if mod.total_duration %}
-              <span class="module-card__meta-dot"></span>
-              <span>⏱ {{ mod.total_duration }} daq</span>
-              {% endif %}
-              {% if m.total %}
-              <span class="module-card__meta-dot"></span>
-              <span>{{ m.done }}/{{ m.total }} tugadi</span>
-              {% endif %}
+              <span>{{ m.total }} video</span>
+              {% if mod.total_duration %}<span>·</span><span>{{ mod.total_duration }} daq</span>{% endif %}
               {% if m.lock_reason == 'cooldown' and m.cooldown_seconds %}
-              <span class="cooldown-mini" data-cooldown-mini="{{ m.cooldown_seconds }}">
-                ⏰ <span class="cooldown-mini__time">--:--</span>
-              </span>
+                <span>·</span>
+                <span data-cooldown-mini="{{ m.cooldown_seconds }}" class="cooldown-mini-text">
+                  <span class="cooldown-mini__time">--:--</span>
+                </span>
               {% endif %}
             </div>
           </div>
 
-          <!-- Inline CTA -->
-          <div class="module-card__cta">
-            {% if m.lock_reason == 'cooldown' %}
-              ⏰ Tez orada
-            {% elif m.lock_reason == 'not_enrolled' %}
-              🔒 Kursni oching
-            {% elif m.lock_reason == 'progression' %}
-              🔒 Oldingisini tugating
-            {% elif m.percent == 0 %}
-              ▶ Boshlash
-            {% elif m.is_complete %}
-              ✓ Tugatildi
-            {% else %}
-              ▶ Davom etish
-            {% endif %}
-          </div>
-
-          <!-- Chevron -->
+          <!-- Chevron only -->
           <div class="module-card__chevron">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
@@ -185,33 +109,21 @@
               {% endfor %}
             {% else %}
               <div style="padding:24px;text-align:center;color:var(--text-muted);font-size:14px">
-                Bu modulga videolar tez orada qo'shiladi
+                Videolar tez orada qo'shiladi
               </div>
             {% endif %}
           {% else %}
-            <div class="module-locked-banner">
+            <!-- Locked: minimal, no buy CTA -->
+            <div class="module-locked-min">
               {% if m.lock_reason == 'cooldown' %}
-                <div class="module-locked-banner__icon">⏰</div>
-                <p class="module-locked-banner__title">Modul tez orada ochiladi</p>
-                <p class="module-locked-banner__text">
-                  Bir kunda bitta modul — bilim singdirish uchun vaqt kerak.
-                </p>
-                <div class="cooldown-block" data-cooldown="{{ m.cooldown_seconds }}">
-                  <span class="cooldown-block__label">Ochilishigacha</span>
-                  <span class="cooldown-block__time">--:--:--</span>
-                  <span class="cooldown-block__sub">Soat : Daqiqa : Soniya</span>
-                </div>
-              {% elif m.lock_reason == 'not_enrolled' %}
-                <div class="module-locked-banner__icon">🔒</div>
-                <p class="module-locked-banner__title">Bu modul yopiq</p>
-                <p class="module-locked-banner__text">To'liq kursni ochish uchun to'lov qiling</p>
-                <a href="https://t.me/bu_nurbek" target="_blank" rel="noopener" class="btn btn--primary btn--sm" style="margin-top:14px">
-                  Telegram orqali to'lash
-                </a>
+                <p>Bu modul {{ m.cooldown_seconds|default:0 }} soniyadan keyin ochiladi.</p>
+                <span class="cooldown-pill" data-cooldown="{{ m.cooldown_seconds }}">
+                  <span class="cooldown-pill__time">--:--:--</span>
+                </span>
+              {% elif m.lock_reason == 'progression' %}
+                <p>Avval oldingi modulni tugating.</p>
               {% else %}
-                <div class="module-locked-banner__icon">🔒</div>
-                <p class="module-locked-banner__title">Avval oldingi modulni tugating</p>
-                <p class="module-locked-banner__text">Keyingi modul ochilishi uchun oldingi modulning barcha videolari tugatilishi kerak</p>
+                <p>Bu modul kursning ichida.</p>
               {% endif %}
             </div>
           {% endif %}
@@ -223,18 +135,24 @@
 
     </div>
 
+    {% if not user.is_enrolled %}
+    <!-- ONE subtle upgrade hint at the bottom — no aggressive sell -->
+    <p class="upgrade-hint">
+      To'liq kursga kirish uchun <a href="https://t.me/bu_nurbek" target="_blank" rel="noopener">@bu_nurbek</a> ga yozing
+    </p>
+    {% endif %}
+
   </div>
 </div>
 
 <script>
-  // 1. Animate progress rings on render
+  // Animate progress rings
   document.querySelectorAll('.ring').forEach(ring => {
     const circle = ring.querySelector('.ring__fill');
     if (!circle) return;
     const pctText = ring.querySelector('.ring__text')?.textContent.trim().replace('%','');
     const pct = parseInt(pctText) || 0;
-    const r = 15.9;
-    const C = 2 * Math.PI * r; // ~99.9
+    const C = 2 * Math.PI * 15.9;
     circle.setAttribute('stroke-dasharray', C);
     circle.setAttribute('stroke-dashoffset', C);
     requestAnimationFrame(() => {
@@ -242,48 +160,40 @@
     });
   });
 
-  // 2. Live countdown timers (big block & mini badge)
+  // Live countdowns
   function pad(n) { return String(n).padStart(2, '0'); }
   function fmtBig(s) {
     if (s <= 0) return '00:00:00';
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
-    const sec = s % 60;
-    return `${pad(h)}:${pad(m)}:${pad(sec)}`;
+    return `${pad(h)}:${pad(m)}:${pad(s % 60)}`;
   }
   function fmtMini(s) {
-    if (s <= 0) return 'Tayyor';
+    if (s <= 0) return 'tayyor';
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
     if (h > 0) return `${h}s ${m}m`;
-    const sec = s % 60;
-    return `${m}m ${pad(sec)}s`;
+    return `${m}m ${pad(s % 60)}s`;
   }
-
   function startCountdown(el, fmt, totalSeconds) {
     const target = Date.now() + totalSeconds * 1000;
     function tick() {
       const remain = Math.max(0, Math.round((target - Date.now()) / 1000));
       el.textContent = fmt(remain);
-      if (remain <= 0) {
-        // Auto-reload after a small delay so the new module unlocks visually
-        setTimeout(() => window.location.reload(), 1500);
-        return;
-      }
+      if (remain <= 0) { setTimeout(() => window.location.reload(), 1500); return; }
       setTimeout(tick, 1000);
     }
     tick();
   }
-
-  document.querySelectorAll('.cooldown-block').forEach(block => {
-    const secs = parseInt(block.dataset.cooldown || '0');
-    const display = block.querySelector('.cooldown-block__time');
-    if (display && secs > 0) startCountdown(display, fmtBig, secs);
+  document.querySelectorAll('.cooldown-pill').forEach(el => {
+    const secs = parseInt(el.dataset.cooldown || '0');
+    const d = el.querySelector('.cooldown-pill__time');
+    if (d && secs > 0) startCountdown(d, fmtBig, secs);
   });
-  document.querySelectorAll('.cooldown-mini').forEach(mini => {
-    const secs = parseInt(mini.dataset.cooldownMini || '0');
-    const display = mini.querySelector('.cooldown-mini__time');
-    if (display && secs > 0) startCountdown(display, fmtMini, secs);
+  document.querySelectorAll('[data-cooldown-mini]').forEach(el => {
+    const secs = parseInt(el.dataset.cooldownMini || '0');
+    const d = el.querySelector('.cooldown-mini__time');
+    if (d && secs > 0) startCountdown(d, fmtMini, secs);
   });
 </script>
 {% endblock %}

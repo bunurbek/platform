@@ -334,6 +334,122 @@
   box-shadow: 0 0 8px var(--gold-glow);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   MINIMAL OVERRIDES — quieter palette, less decoration
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Continue card — flat, single-row, no gradients */
+.continue-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius);
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.continue-card__main { flex: 1; min-width: 0; }
+.continue-card__label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.continue-card__title-min {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.continue-card--cooldown { border-color: rgba(93,173,226,0.25) !important; }
+.continue-card--cooldown .continue-card__label { color: #5dade2; }
+.continue-card--complete { border-color: rgba(46,204,113,0.25) !important; }
+.continue-card--complete .continue-card__label { color: var(--success); }
+
+/* Inline cooldown pill */
+.cooldown-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: rgba(93,173,226,0.1);
+  border: 1px solid rgba(93,173,226,0.25);
+  border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #5dade2;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.cooldown-mini-text {
+  color: #5dade2;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* Minimal locked banner — no buy button, no big lock icon */
+.module-locked-min {
+  padding: 18px 24px;
+  text-align: center;
+  background: var(--bg-2);
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.module-locked-min p { margin: 0; }
+
+/* Subtle upgrade hint at the page bottom */
+.upgrade-hint {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.upgrade-hint a {
+  color: var(--gold);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color .15s;
+}
+.upgrade-hint a:hover { border-bottom-color: var(--gold); }
+
+/* Course header — less prominent */
+.course-header { margin-bottom: 28px !important; }
+.course-header h1 { font-size: clamp(24px, 3.5vw, 32px) !important; }
+
+/* Module cards — softer, no aggressive glow */
+.module-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color var(--transition);
+  margin-bottom: 8px;
+}
+.module-card:hover { border-color: var(--border-2); }
+.module-card--open { border-color: var(--border-2); }
+.module-card--locked { opacity: 0.65; }
+.module-card--locked:hover { opacity: 0.85; }
+.module-card--complete .ring__fill { stroke: var(--success); filter: none; }
+
+/* Ring — drop the gold glow, simpler */
+.ring__fill { filter: none !important; }
+.ring--cooldown .ring__fill { filter: none !important; }
+.ring--complete .ring__fill { filter: none !important; }
+
 /* ── Homework card ─────────────────────────────────────────────────────── */
 .homework-card {
   background: linear-gradient(135deg, rgba(232,184,75,0.08) 0%, rgba(232,184,75,0.02) 100%);

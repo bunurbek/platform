@@ -29,15 +29,15 @@
 
     {% elif lock_reason == 'not_enrolled' %}
       <div class="lock-card__icon">🔒</div>
-      <h1 class="lock-card__title">Bu modul kursning ichida</h1>
+      <h1 class="lock-card__title">Bu modul yopiq</h1>
       <p class="lock-card__text">
-        <strong style="color:var(--text)">{{ module.title }}</strong> — kursni ochish uchun bir martalik to'lov qiling.
-        Telegram orqali tezkor xizmat ko'rsatamiz.
+        <strong style="color:var(--text)">{{ module.title }}</strong> moduliga kirish uchun
+        to'liq kursni oching.
       </p>
-      <a href="https://t.me/bu_nurbek" target="_blank" rel="noopener" class="btn btn--primary btn--lg btn--full" style="margin-bottom:12px">
-        Telegram orqali to'lash
-      </a>
-      <a href="{% url 'course_home' %}" class="btn btn--ghost btn--full">← Kursga qaytish</a>
+      <a href="{% url 'course_home' %}" class="btn btn--primary btn--full" style="margin-bottom:12px">← Kursga qaytish</a>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:8px">
+        Savollar uchun: <a href="https://t.me/bu_nurbek" target="_blank" rel="noopener" style="color:var(--gold)">@bu_nurbek</a>
+      </p>
 
     {% else %}
       <div class="lock-card__icon">🔒</div>
