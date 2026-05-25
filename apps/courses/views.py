@@ -83,33 +83,22 @@ def course_home(request):
 
 @login_required
 def free_lesson(request):
-    """Standalone first-lesson page (free preview).
-    Plays the first sub-lesson of the first (free) module.
-    After completion → conversion modal."""
+    """Redirects to the first incomplete (or first) lesson of the free module.
+    The unified lesson view handles all the UI."""
     course = get_object_or_404(Course, is_active=True)
     free_module = course.modules.filter(is_free=True).order_by('order').first() \
                   or course.modules.order_by('order').first()
     if not free_module:
         return redirect('landing')
 
-    lesson = free_module.lessons.order_by('order').first()
-    if not lesson:
-        # No sub-lesson yet — fall back to module overview with a placeholder
-        return render(request, 'courses/free_lesson.html', {
-            'lesson': None,
-            'module': free_module,
-            'course': course,
-            'total_lessons': sum(m.lesson_count for m in course.modules.all()),
-            'total_modules': course.modules.count(),
-        })
-
-    return render(request, 'courses/free_lesson.html', {
-        'lesson': lesson,
-        'module': free_module,
-        'course': course,
-        'total_lessons': sum(m.lesson_count for m in course.modules.all()),
-        'total_modules': course.modules.count(),
-    })
+    completed_ids = set(LessonProgress.objects.filter(
+        user=request.user, lesson__module=free_module, completed=True
+    ).values_list('lesson_id', flat=True))
+    lessons = list(free_module.lessons.order_by('order'))
+    target = next((l for l in lessons if l.pk not in completed_ids), None) or (lessons[0] if lessons else None)
+    if not target:
+        return redirect('course_home')
+    return redirect('lesson', pk=target.pk)
 
 
 @login_required
@@ -136,18 +125,21 @@ def lesson_view(request, pk):
 
     progress, _ = LessonProgress.objects.get_or_create(user=request.user, lesson=lesson)
 
-    # Build navigation: prev/next sub-lesson WITHIN module, or jump to next module's first
-    all_lessons = list(module.lessons.all())
-    idx = next((i for i, l in enumerate(all_lessons) if l.pk == lesson.pk), 0)
-    prev_lesson = all_lessons[idx - 1] if idx > 0 else None
-    next_lesson = all_lessons[idx + 1] if idx + 1 < len(all_lessons) else None
+    # Sub-lessons in this module — for the numbered strip
+    module_lessons = list(module.lessons.order_by('order'))
+    idx = next((i for i, l in enumerate(module_lessons) if l.pk == lesson.pk), 0)
+    prev_lesson = module_lessons[idx - 1] if idx > 0 else None
+    next_lesson = module_lessons[idx + 1] if idx + 1 < len(module_lessons) else None
+    completed_in_module = set(LessonProgress.objects.filter(
+        user=request.user, lesson__module=module, completed=True
+    ).values_list('lesson_id', flat=True))
 
     # If at the end of this module, see if next module is accessible
     next_module = None
     if not next_lesson:
         next_module = course.modules.filter(order__gt=module.order).order_by('order').first()
 
-    # Sidebar: full course outline with lock state
+    # Sidebar: full course outline with lock state (for desktop sidebar + mobile drawer)
     modules_outline = []
     for m in course.modules.prefetch_related('lessons').all():
         modules_outline.append({
@@ -162,6 +154,13 @@ def lesson_view(request, pk):
             'is_current_module': m.pk == module.pk,
         })
 
+    # Show conversion modal trigger: unenrolled user finishing the last lesson of the free module
+    is_last_in_free_module = (
+        module.is_free
+        and not request.user.is_enrolled
+        and lesson.pk == module_lessons[-1].pk if module_lessons else False
+    )
+
     return render(request, 'courses/lesson.html', {
         'lesson': lesson,
         'module': module,
@@ -171,6 +170,10 @@ def lesson_view(request, pk):
         'next_lesson': next_lesson,
         'next_module': next_module,
         'modules_outline': modules_outline,
+        'module_lessons': module_lessons,
+        'completed_in_module': completed_in_module,
+        'lesson_index': idx,
+        'show_conversion_on_end': is_last_in_free_module,
     })
 
 

@@ -16,7 +16,7 @@ import requests
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from apps.accounts.models import TelegramAuthSession
+from apps.accounts.models import TelegramAuthSession, CustomUser
 
 logging.basicConfig(
     format='%(asctime)s — %(levelname)s — %(message)s',
@@ -135,10 +135,31 @@ class Command(BaseCommand):
             session.telegram_id         = tg_id
             session.telegram_username   = tg_user.get('username', '') or ''
             session.telegram_first_name = tg_user.get('first_name', '') or ''
-            session.status = 'awaiting_contact'
             session.save()
             log.info(f"Session {session_token[:8]}... linked to @{tg_user.get('username') or tg_id}")
 
+            # If this Telegram user already has an account, skip contact + name
+            existing = CustomUser.objects.filter(telegram_id=tg_id).first()
+            if existing:
+                import random
+                code = f"{random.randint(0, 999999):06d}"
+                session.collected_name = existing.full_name or session.telegram_first_name
+                session.phone = existing.phone or ''
+                session.code = code
+                session.status = 'ready'
+                session.save()
+                log.info(f"Returning user @{tg_user.get('username') or tg_id} — code {code}")
+                pretty = " ".join(code[:3]) + " — " + " ".join(code[3:])
+                self._send(chat_id,
+                    f"👋 Xush kelibsiz, *{existing.display_name}*!\n\n"
+                    f"Sizning kirish kodingiz:\n\n`{pretty}`\n\n"
+                    f"Saytga qayting va kodni kiriting.\n"
+                    f"_Kod 10 daqiqa amal qiladi._")
+                return
+
+            # New user — collect contact first
+            session.status = 'awaiting_contact'
+            session.save()
             greet_name = session.telegram_first_name or "do'st"
             self._send_with_contact_button(chat_id,
                 f"👋 Salom, *{greet_name}*!\n\n"
