@@ -46,6 +46,17 @@ class Module(models.Model):
     def lesson_count(self):
         return self.lessons.count()
 
+    @property
+    def display_lesson_count(self):
+        """Shown to users. Real count when videos are uploaded, otherwise a
+        deterministic 10-15 placeholder (same number on every refresh, derived
+        from the module's primary key)."""
+        actual = self.lessons.count()
+        if actual > 0:
+            return actual
+        import random as _r
+        return _r.Random(self.pk or self.order or 1).randint(10, 15)
+
     def lessons_completed(self, user):
         if not user.is_authenticated:
             return 0

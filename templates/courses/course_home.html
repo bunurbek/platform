@@ -77,7 +77,7 @@
             <div class="module-card__num">MODUL {{ mod.order|stringformat:"02d" }}{% if m.is_accessible and not m.is_complete and m.percent > 0 %} · {{ m.percent }}%{% endif %}</div>
             <div class="module-card__title">{{ mod.title }}</div>
             <div class="module-card__meta">
-              <span>{{ m.total }} video</span>
+              <span>{{ mod.display_lesson_count }} video</span>
               {% if m.lock_reason == 'cooldown' and m.cooldown_seconds %}
                 <span>·</span>
                 <span data-cooldown-mini="{{ m.cooldown_seconds }}" class="cooldown-mini-text">

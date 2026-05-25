@@ -33,14 +33,7 @@
     </div>
 
     <div class="hero__trust">
-      <span class="hero__avatars">
-        <img src="{% static 'images/kamron-photo.png' %}" alt="" loading="lazy">
-        <img src="{% static 'images/durdona-photo.jpg' %}" alt="" loading="lazy">
-        <img src="{% static 'images/ismigul-photo.jpg' %}" alt="" loading="lazy">
-      </span>
-      <span><strong style="color:var(--text)">300+</strong> talaba allaqachon o'qimoqda</span>
-      <span class="hero__trust-dot"></span>
-      <span>🎁 Birinchi dars bepul</span>
+      <span>🎁 Birinchi dars bepul · Telegram orqali 30 soniyada</span>
     </div>
 
   </div>
@@ -55,10 +48,6 @@
 <section class="trust-strip">
   <div class="container">
     <div class="trust-strip__inner">
-      <div class="trust-item">
-        <span class="trust-item__num"><span data-count="300" data-suffix="+">0</span></span>
-        <span class="trust-item__label">Talabalar</span>
-      </div>
       <div class="trust-item">
         <span class="trust-item__num"><span data-count="14">0</span></span>
         <span class="trust-item__label">Modullar</span>
@@ -117,8 +106,8 @@
         <p class="section__tag">Muallif</p>
         <h2 class="instructor__name">Nurbek Bahodirov</h2>
         <p class="instructor__bio">
-          5+ yil sinematik videografiya. Brendlar, to'ylar, reklama loyihalari. Endi — barcha sirlarni siz bilan baham ko'raman.
-          Kursda har bir texnika, har bir sozlama va har bir trick — <strong style="color:var(--text)">mening haqiqiy ishlarimdan</strong>.
+          5+ yil sinematik videografiya. Brendlar va reklama loyihalari uchun professional video ishlab chiqaraman.
+          Bu kursda har bir texnika, har bir sozlama va har bir trick — <strong style="color:var(--text)">mening haqiqiy ishlarimdan</strong>.
         </p>
         <div class="instructor__stats">
           <div class="stat-card">
@@ -126,8 +115,8 @@
             <span class="stat-card__label">Yil tajriba</span>
           </div>
           <div class="stat-card">
-            <span class="stat-card__num">300<span style="font-size:0.6em">+</span></span>
-            <span class="stat-card__label">Talabalar</span>
+            <span class="stat-card__num">14</span>
+            <span class="stat-card__label">Modullar</span>
           </div>
           <div class="stat-card">
             <span class="stat-card__num">150<span style="font-size:0.6em">+</span></span>
@@ -195,11 +184,9 @@
             {% if m.is_free %}<span style="display:inline-block;background:rgba(46,204,113,0.15);color:#2ECC71;border:1px solid rgba(46,204,113,0.3);padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-left:6px;vertical-align:middle">🎁 Bepul</span>{% endif %}
           </h3>
           <p>{{ m.description }}</p>
-          {% if m.lesson_count %}
           <p style="font-size:12px;color:var(--text-dim);margin-top:6px;display:flex;align-items:center;gap:6px">
-            <span>🎬 {{ m.lesson_count }} video</span>
+            <span>🎬 {{ m.display_lesson_count }} video</span>
           </p>
-          {% endif %}
         </div>
       </div>
       {% endfor %}
