@@ -1,0 +1,31 @@
+name: Deploy to Droplet
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}   # allows manual trigger from GitHub UI
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false   # don't cancel a deploy mid-flight
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          known_hosts: unnecessary
+          config: |
+            Host droplet
+              HostName ${{ secrets.DROPLET_HOST }}
+              User root
+              StrictHostKeyChecking accept-new
+              ServerAliveInterval 30
+
+      - name: Deploy
+        run: ssh droplet /opt/bunurbek/deploy.sh
