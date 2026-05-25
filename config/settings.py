@@ -155,6 +155,12 @@ LOGIN_REDIRECT_URL = '/kurs/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 
+# ── Session persistence — students stay logged in for 90 days, auto-extended on every visit
+SESSION_COOKIE_AGE          = 60 * 60 * 24 * 90   # 90 days
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False           # survive closing the browser
+SESSION_SAVE_EVERY_REQUEST  = True                # reset the 90-day clock on every page load
+SESSION_COOKIE_SAMESITE     = 'Lax'               # safe default — sent on most navigations
+
 # ── Email ──────────────────────────────────────────────────────────────────────
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST          = os.environ.get('EMAIL_HOST', '')
