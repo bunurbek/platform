@@ -107,28 +107,37 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ── Media files (Cloudflare R2 in production, local in dev) ───────────────────
 USE_R2 = env_bool('USE_R2', False)
+
 if USE_R2:
-    # Cloudflare R2 (S3-compatible). Set these envs:
+    # Cloudflare R2 (S3-compatible). Required envs:
     #   R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_ENDPOINT_URL, R2_PUBLIC_URL
-    AWS_ACCESS_KEY_ID       = os.environ.get('R2_ACCESS_KEY_ID', '')
-    AWS_SECRET_ACCESS_KEY   = os.environ.get('R2_SECRET_ACCESS_KEY', '')
-    AWS_STORAGE_BUCKET_NAME = os.environ.get('R2_BUCKET_NAME', '')
-    AWS_S3_ENDPOINT_URL     = os.environ.get('R2_ENDPOINT_URL', '')
-    AWS_S3_CUSTOM_DOMAIN    = os.environ.get('R2_PUBLIC_URL', '').replace('https://', '').replace('http://', '')
-    AWS_S3_REGION_NAME      = 'auto'
-    AWS_S3_FILE_OVERWRITE   = False
-    AWS_DEFAULT_ACL         = None
-    AWS_QUERYSTRING_AUTH    = False
+    AWS_ACCESS_KEY_ID        = os.environ.get('R2_ACCESS_KEY_ID', '')
+    AWS_SECRET_ACCESS_KEY    = os.environ.get('R2_SECRET_ACCESS_KEY', '')
+    AWS_STORAGE_BUCKET_NAME  = os.environ.get('R2_BUCKET_NAME', '')
+    AWS_S3_ENDPOINT_URL      = os.environ.get('R2_ENDPOINT_URL', '')
+    AWS_S3_CUSTOM_DOMAIN     = os.environ.get('R2_PUBLIC_URL', '').replace('https://', '').replace('http://', '')
+    AWS_S3_REGION_NAME       = 'auto'
+    AWS_S3_FILE_OVERWRITE    = False
+    AWS_DEFAULT_ACL          = None
+    AWS_QUERYSTRING_AUTH     = False
     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_S3_ADDRESSING_STYLE  = 'virtual'
+    AWS_S3_SIGNATURE_VERSION = 's3v4'
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    STORAGES = {
+        'default':     {'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage'},
+        'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
+    }
 else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
+    STORAGES = {
+        'default':     {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
+    }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
