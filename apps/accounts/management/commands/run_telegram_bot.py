@@ -177,13 +177,19 @@ class Command(BaseCommand):
                 return
 
             if session.status != 'awaiting_name':
-                # User chatting outside the flow — give a hint
+                # User chatting outside the flow — give a hint based on current stage
                 if session.status == 'awaiting_contact':
                     self._send_with_contact_button(chat_id,
                         "Avval telefon raqamingizni ulashing 👇")
+                elif session.status == 'ready' and session.code:
+                    # Already got code — show it again
+                    pretty = " ".join(session.code[:3]) + " — " + " ".join(session.code[3:])
+                    self._send(chat_id,
+                        f"Sizning kodingiz hali ham amal qiladi:\n\n`{pretty}`\n\n"
+                        "Saytga qayting va kiriting.")
                 else:
                     self._send(chat_id,
-                        "Saytda davom etish uchun yuborilgan tugmani bosing.")
+                        "Saytdan \"Bepul boshlash\" tugmasini bosib qaytadan boshlang.")
                 return
 
             name = text[:200].strip()
@@ -191,20 +197,24 @@ class Command(BaseCommand):
                 self._send(chat_id, "Iltimos, to'liq ism kiriting.")
                 return
 
+            # Generate a fresh 6-digit code
+            import random
+            code = f"{random.randint(0, 999999):06d}"
+
             session.collected_name = name
+            session.code = code
             session.status = 'ready'
             session.save()
 
-            auth_url = f"{SITE_URL}/start/finish/{session.token}/"
-            log.info(f"Auth link issued: {auth_url}")
+            log.info(f"Code {code} issued to @{tg_user.get('username') or tg_user.get('id')} for session {session.token[:8]}...")
 
-            self._send_with_url_button(chat_id,
-                button_text="🚀 Saytda davom etish",
-                button_url=auth_url,
-                text=(
-                    f"✅ Rahmat, *{name}*!\n\n"
-                    f"Endi pastdagi tugmani bosing — birinchi darsingiz boshlanadi 🎬"
-                ))
+            pretty = " ".join(code[:3]) + " — " + " ".join(code[3:])
+            self._send(chat_id,
+                f"✅ Rahmat, *{name}*!\n\n"
+                f"Sizning kirish kodingiz:\n\n"
+                f"`{pretty}`\n\n"
+                f"📋 Bu kodni nusxalab, saytga qayting va kiriting.\n"
+                f"_Kod 10 daqiqa amal qiladi._")
 
     # ── Telegram API helpers ──────────────────────────────────────────────────
 

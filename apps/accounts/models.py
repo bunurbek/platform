@@ -73,6 +73,7 @@ class TelegramAuthSession(models.Model):
         ('expired',           'Muddati o\'tdi'),
     ]
     token       = models.CharField(max_length=64, unique=True, db_index=True)  # passed in /start
+    code        = models.CharField(max_length=6, blank=True)  # 6-digit code shown in bot
     status      = models.CharField(max_length=20, choices=STATUS, default='pending')
     telegram_id         = models.BigIntegerField(null=True, blank=True)
     telegram_username   = models.CharField(max_length=64, blank=True)

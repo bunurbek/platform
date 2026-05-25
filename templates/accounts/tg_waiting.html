@@ -32,6 +32,7 @@
         <div class="step done"><span>1</span> Telegram ochildi</div>
         <div class="step active"><span>2</span> Telefon raqami</div>
         <div class="step"><span>3</span> Ism</div>
+        <div class="step"><span>4</span> Kod</div>
       </div>
     </div>
 
@@ -47,21 +48,43 @@
         <div class="step done"><span>1</span> Telegram</div>
         <div class="step done"><span>2</span> Telefon</div>
         <div class="step active"><span>3</span> Ism</div>
+        <div class="step"><span>4</span> Kod</div>
       </div>
     </div>
 
-    <!-- Ready — auth button sent -->
+    <!-- Ready — code generated, user pastes it here -->
     <div x-show="state === 'ready'" x-cloak>
-      <div style="font-size:48px;margin-bottom:16px">🚀</div>
-      <h1 class="form-card__title">Botdagi tugmani bosing!</h1>
-      <p class="form-card__sub" style="margin-bottom:24px">
+      <div style="font-size:48px;margin-bottom:12px">🔐</div>
+      <h1 class="form-card__title">6 xonali kodni kiriting</h1>
+      <p class="form-card__sub" style="margin-bottom:20px">
+        <span style="color:#2ECC71">✓</span>
         Salom, <strong style="color:#F0F0F0" x-text="name"></strong>!<br>
-        Telegramdagi <strong style="color:#E8B84B">Saytda davom etish</strong> tugmasini bosing.
+        Telegramdan kelgan <strong style="color:#E8B84B">6 xonali kodni</strong> shu yerga kiriting:
       </p>
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px;color:#A0A0A0;font-size:13px">
-        <div class="loader"></div>
-        <span>Tasdiqlash kutilmoqda...</span>
+
+      <div class="code-inputs" @paste="handlePaste">
+        <template x-for="i in 6" :key="i">
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1"
+                 class="code-input"
+                 x-model="digits[i-1]"
+                 :ref="'d' + (i-1)"
+                 @input="onInput($event, i-1)"
+                 @keydown.backspace="onBackspace($event, i-1)">
+        </template>
       </div>
+
+      <p x-show="error" x-text="error" style="color:#e74c3c;font-size:14px;margin-top:14px"></p>
+
+      <button @click="verify()" :disabled="loading || code.length !== 6"
+              class="btn btn--primary btn--full" style="margin-top:20px"
+              :style="(loading || code.length !== 6) ? 'opacity:0.5;cursor:not-allowed' : ''">
+        <span x-show="!loading">✓ Tasdiqlash</span>
+        <span x-show="loading">Tekshirilmoqda...</span>
+      </button>
+
+      <p style="font-size:12px;color:#606060;margin-top:14px">
+        Kod kelmadimi? <a :href="tgLink" target="_blank" style="color:#E8B84B">Telegramni qayta oching</a>
+      </p>
     </div>
 
     <!-- Verified — auto-login -->
@@ -96,36 +119,63 @@
 .step-status {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   margin-top: 28px;
   padding-top: 24px;
   border-top: 1px solid #252525;
+  flex-wrap: wrap;
 }
 .step {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  gap: 6px;
+  font-size: 11px;
   color: #404040;
   font-weight: 500;
   justify-content: center;
+  min-width: 0;
 }
 .step span {
-  width: 22px; height: 22px;
+  width: 20px; height: 20px;
   border-radius: 50%;
   background: #2a2a2a;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 11px;
+  font-weight: 700; font-size: 10px;
   color: #606060;
+  flex-shrink: 0;
 }
 .step.active { color: #E8B84B; }
 .step.active span { background: rgba(232,184,75,0.15); color: #E8B84B; border: 1px solid rgba(232,184,75,0.3); }
 .step.done { color: #2ECC71; }
-.step.done span { background: rgba(46,204,113,0.15); color: #2ECC71; }
-.step.done span::after { content: '✓'; position: absolute; }
-.step.done span { font-size: 0; }
-.step.done span::after { font-size: 11px; }
+.step.done span { background: rgba(46,204,113,0.15); color: #2ECC71; font-size: 0; }
+.step.done span::after { content: '✓'; font-size: 11px; }
+
+.code-inputs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 12px 0;
+  flex-wrap: nowrap;
+}
+.code-input {
+  width: 44px; height: 56px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  background: #0D0D0D;
+  border: 1px solid #333;
+  border-radius: 10px;
+  color: #F0F0F0;
+  font-family: 'JetBrains Mono', monospace;
+  -webkit-text-fill-color: #F0F0F0; /* iOS */
+  appearance: none;
+}
+.code-input:focus { outline: none; border-color: #E8B84B; box-shadow: 0 0 0 3px rgba(232,184,75,0.12); }
+@media (max-width: 400px) {
+  .code-input { width: 38px; height: 50px; font-size: 20px; }
+  .code-inputs { gap: 6px; }
+}
 </style>
 {% endblock %}
 
@@ -137,7 +187,13 @@ function tgWaiting() {
     welcomeText: '',
     phone: '',
     name: '',
+    digits: ['','','','','',''],
+    error: '',
+    loading: false,
+    tgLink: '{{ tg_link }}',
     pollHandle: null,
+
+    get code() { return this.digits.join('') },
 
     init() {
       this.poll();
@@ -145,18 +201,13 @@ function tgWaiting() {
     },
 
     async poll() {
+      // Stop polling once we're in code-entry mode (avoid race overwriting digits)
+      if (this.state === 'ready' || this.state === 'verified') return;
       try {
         const res = await fetch('{% url "tg_status" %}', {
           method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}'}
         });
         const data = await res.json();
-
-        if (data.state === 'verified' && data.redirect) {
-          this.state = 'verified';
-          clearInterval(this.pollHandle);
-          setTimeout(() => window.location.href = data.redirect, 600);
-          return;
-        }
 
         if (data.state === 'awaiting_contact') {
           this.state = 'awaiting_contact';
@@ -168,11 +219,65 @@ function tgWaiting() {
         } else if (data.state === 'ready') {
           this.state = 'ready';
           this.name = data.name || '';
+          clearInterval(this.pollHandle);
+          this.$nextTick(() => this.$refs.d0?.focus());
+        } else if (data.state === 'verified' && data.redirect) {
+          this.state = 'verified';
+          clearInterval(this.pollHandle);
+          setTimeout(() => window.location.href = data.redirect, 600);
         } else if (data.state === 'expired' || data.state === 'no_session') {
           this.state = data.state;
           clearInterval(this.pollHandle);
         }
-      } catch (e) { /* ignore transient errors */ }
+      } catch (e) { /* ignore transient network errors */ }
+    },
+
+    onInput(e, idx) {
+      const val = e.target.value.replace(/\D/g,'').slice(0,1);
+      this.digits[idx] = val;
+      if (val && idx < 5) this.$refs['d' + (idx+1)]?.focus();
+      if (this.code.length === 6) this.verify();
+    },
+
+    onBackspace(e, idx) {
+      if (!this.digits[idx] && idx > 0) {
+        this.$refs['d' + (idx-1)]?.focus();
+      }
+    },
+
+    handlePaste(e) {
+      e.preventDefault();
+      const text = (e.clipboardData?.getData('text') || '').replace(/\D/g,'').slice(0,6);
+      for (let i=0; i<6; i++) this.digits[i] = text[i] || '';
+      if (this.code.length === 6) this.$nextTick(() => this.verify());
+    },
+
+    async verify() {
+      if (this.loading || this.code.length !== 6) return;
+      this.loading = true;
+      this.error = '';
+      try {
+        const fd = new FormData();
+        fd.append('code', this.code);
+        const res = await fetch('{% url "tg_verify" %}', {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          body: fd,
+        });
+        const data = await res.json();
+        if (data.ok) {
+          this.state = 'verified';
+          setTimeout(() => window.location.href = data.redirect, 500);
+        } else {
+          this.error = data.error || 'Xatolik';
+          this.digits = ['','','','','',''];
+          this.$nextTick(() => this.$refs.d0?.focus());
+        }
+      } catch (e) {
+        this.error = 'Server xatosi';
+      } finally {
+        this.loading = false;
+      }
     }
   }
 }

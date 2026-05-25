@@ -78,25 +78,35 @@ def tg_status(request):
     })
 
 
-def tg_finish(request, token):
-    """Finalize auth — called when user clicks the magic link inside Telegram.
+@require_POST
+def tg_verify(request):
+    """User pasted the 6-digit code → verify, create/find user, log in.
 
-    Creates/finds the user with all collected data, marks session verified,
-    logs them in, and redirects to the free lesson."""
+    Returns JSON: {ok, error, redirect}."""
+    token = request.session.get('tg_auth_token')
+    code  = (request.POST.get('code') or '').strip()
+
+    if not token:
+        return JsonResponse({'ok': False, 'error': "Sessiya tugagan — qaytadan boshlang"})
+
     try:
         s = TelegramAuthSession.objects.get(token=token)
     except TelegramAuthSession.DoesNotExist:
-        return render(request, 'accounts/tg_error.html', {'error': "Sessiya topilmadi"})
+        return JsonResponse({'ok': False, 'error': "Sessiya topilmadi"})
 
     if s.is_expired():
-        return render(request, 'accounts/tg_error.html', {'error': "Sessiya muddati o'tdi"})
+        return JsonResponse({'ok': False, 'error': "Sessiya muddati o'tdi (10 daqiqa)"})
 
     if s.status not in ('ready', 'verified'):
-        return render(request, 'accounts/tg_error.html', {
-            'error': "Avval botda barcha ma'lumotlarni to'ldiring"
-        })
+        return JsonResponse({'ok': False, 'error': "Avval botda ism va telefonni kiriting"})
 
-    # Find or create user by telegram_id
+    if not s.code:
+        return JsonResponse({'ok': False, 'error': "Kod hali yaratilmagan"})
+
+    if s.code != code:
+        return JsonResponse({'ok': False, 'error': "Kod noto'g'ri — botdan kelgan kodni tekshiring"})
+
+    # ── Code matches — create/find user and log in ────────────────────────
     user, created = CustomUser.objects.get_or_create(
         telegram_id=s.telegram_id,
         defaults={
@@ -120,7 +130,7 @@ def tg_finish(request, token):
 
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
     request.session.pop('tg_auth_token', None)
-    return redirect('free_lesson')
+    return JsonResponse({'ok': True, 'redirect': '/kurs/bepul-dars/'})
 
 
 # ── BACKUP EMAIL LOGIN (kept for admin / fallback) ─────────────────────────────
