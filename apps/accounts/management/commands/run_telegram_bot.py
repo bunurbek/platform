@@ -15,6 +15,7 @@ import time
 import requests
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.db import close_old_connections
 
 from apps.accounts.models import TelegramAuthSession, CustomUser
 
@@ -88,18 +89,26 @@ class Command(BaseCommand):
 
                 for update in data.get('result', []):
                     offset = update['update_id'] + 1
+                    # Drop stale Postgres connections before each handler — long-running
+                    # daemons need this since Django does not auto-reconnect.
+                    close_old_connections()
                     try:
                         self._handle_update(update)
                     except Exception as e:
                         log.exception(f"Update error: {e}")
+                        # If DB went down mid-handler, force reconnect on next loop
+                        close_old_connections()
 
             except requests.exceptions.Timeout:
+                # Long-poll cycle elapsed with no updates — also a good time to refresh
+                close_old_connections()
                 continue
             except KeyboardInterrupt:
                 self.stdout.write("\nBot stopped.")
                 break
             except Exception as e:
                 log.error(f"Polling error: {e}")
+                close_old_connections()
                 time.sleep(3)
 
     # ── Update routing ────────────────────────────────────────────────────────

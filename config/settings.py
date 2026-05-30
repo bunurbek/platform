@@ -85,7 +85,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 if DATABASE_URL:
     import dj_database_url
-    DATABASES = {'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)}
+    # conn_max_age=0 closes connections immediately after each query.
+    # Important for the long-running Telegram bot worker — otherwise idle
+    # connections eventually get killed by PG and queries start failing.
+    DATABASES = {'default': dj_database_url.parse(DATABASE_URL, conn_max_age=0, ssl_require=True)}
 else:
     DATABASES = {
         'default': {
