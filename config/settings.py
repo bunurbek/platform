@@ -126,7 +126,11 @@ if USE_R2:
     AWS_S3_FILE_OVERWRITE    = False
     AWS_DEFAULT_ACL          = None
     AWS_QUERYSTRING_AUTH     = False
-    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+        # Force inline disposition so browsers stream instead of downloading
+        'ContentDisposition': 'inline',
+    }
     AWS_S3_ADDRESSING_STYLE  = 'virtual'
     AWS_S3_SIGNATURE_VERSION = 's3v4'
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"

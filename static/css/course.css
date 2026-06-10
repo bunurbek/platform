@@ -657,6 +657,20 @@
 /* Lesson row check icon */
 .lesson-row__check { color: var(--success); font-weight: 700; }
 
+/* ── Video player anti-download hardening ── */
+.video-wrapper {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;  /* iOS — disable long-press "Save" menu */
+}
+.video-wrapper video {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: auto;
+}
+/* Hide any download-link styles a browser extension might inject */
+.video-wrapper [class*="download"] { display: none !important; }
+
 /* ── Sticky prev/next bar — always visible at bottom ── */
 .lesson-page-min { padding-bottom: 100px !important; }   /* room for sticky bar */
 @media (max-width: 600px) { .lesson-page-min { padding-bottom: 90px !important; } }

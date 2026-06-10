@@ -24,12 +24,16 @@
     <h1 class="lesson-title-min">{{ lesson.title }}</h1>
 
     <!-- ── Video player ────────────────────────────────────────── -->
-    <div class="video-wrapper">
+    <div class="video-wrapper" oncontextmenu="return false;">
       {% if lesson.video_url %}
         <iframe src="{{ lesson.video_url }}" allowfullscreen allow="encrypted-media; picture-in-picture; fullscreen"></iframe>
       {% elif lesson.video_file %}
         <video controls playsinline preload="metadata"
-               @ended="onVideoEnd()">
+               controlsList="nodownload noremoteplayback noplaybackrate"
+               disablePictureInPicture
+               disableRemotePlayback
+               @ended="onVideoEnd()"
+               oncontextmenu="return false;">
           <source src="{{ lesson.video_file.url }}" type="video/mp4">
         </video>
       {% else %}
