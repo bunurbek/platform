@@ -25,7 +25,18 @@
 
     <!-- ── Video player ────────────────────────────────────────── -->
     <div class="video-wrapper" oncontextmenu="return false;">
-      {% if lesson.video_url %}
+      {% if lesson.video_url and lesson.video_url|slice:"-4:" == ".mp4" or lesson.video_url|slice:"-5:" == ".webm" or lesson.video_url|slice:"-4:" == ".mov" %}
+        <!-- Direct video file URL — use HTML5 video element (NOT iframe) -->
+        <video controls playsinline preload="metadata"
+               controlsList="nodownload noremoteplayback noplaybackrate"
+               disablePictureInPicture
+               disableRemotePlayback
+               @ended="onVideoEnd()"
+               oncontextmenu="return false;">
+          <source src="{{ lesson.video_url }}" type="video/mp4">
+        </video>
+      {% elif lesson.video_url %}
+        <!-- YouTube/Vimeo embed URL -->
         <iframe src="{{ lesson.video_url }}" allowfullscreen allow="encrypted-media; picture-in-picture; fullscreen"></iframe>
       {% elif lesson.video_file %}
         <video controls playsinline preload="metadata"
